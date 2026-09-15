@@ -1,0 +1,2197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2026国庆三峡环线</title>
+  <style>
+    :root {
+      --paper: #0b1220;
+      --ink: #e8eef8;
+      --mute: #8aa0c0;
+      --accent: #38bdf8;
+      --boat: #22d3ee;
+      --land: #f59e0b;
+      --rail: #a78bfa;
+      --gold: #e8b86d;
+      --eat: #fb923c;
+      --mint: #34d399;
+      --alert: #fb7185;
+      --card: #121c30;
+      --line: #2a3f63;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+    }
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #3d5a86 #0b1220;
+    }
+    *::-webkit-scrollbar { width: 8px; height: 8px; }
+    *::-webkit-scrollbar-track { background: #0b1220; }
+    *::-webkit-scrollbar-thumb {
+      background: #3d5a86;
+      border-radius: 8px;
+    }
+    *::-webkit-scrollbar-thumb:hover { background: #5b7aa8; }
+    .app {
+      display: grid;
+      grid-template-columns: minmax(320px, 42%) 1px 1fr;
+      height: 100%;
+      min-height: 100%;
+    }
+    .split {
+      background: #2a3f63;
+      width: 1px;
+      min-height: 100%;
+    }
+    .map-side {
+      background: #0b1220;
+      color: #e8eef8;
+      padding: 28px 24px 20px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .kicker {
+      font-size: 12px;
+      letter-spacing: 0.28em;
+      color: #8aa0c0;
+      margin: 0;
+    }
+    .map-side h1 {
+      font-family: "STSong", "SimSun", serif;
+      font-size: 34px;
+      font-weight: 600;
+      margin: 4px 0 0;
+      line-height: 1.2;
+    }
+    .sub {
+      color: #a8b8d4;
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 0;
+    }
+    .modes { display: flex; gap: 8px; }
+    .modes button {
+      flex: 1;
+      border: 1px solid #2a3f63;
+      background: transparent;
+      color: #d5e2f5;
+      padding: 9px 0;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .modes button.on {
+      background: #12263f;
+      color: #38bdf8;
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.28);
+    }
+    .map-wrap {
+      flex: 1;
+      min-height: 220px;
+      position: relative;
+      overflow: hidden;
+      touch-action: none;
+      overscroll-behavior: contain;
+      cursor: grab;
+      user-select: none;
+    }
+    .map-wrap.is-panning { cursor: grabbing; }
+    .map-wrap svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: hidden;
+      shape-rendering: geometricPrecision;
+    }
+    .river, .path-land, .path-boat, .path-back {
+      vector-effect: non-scaling-stroke;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .map-zoom {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      z-index: 2;
+    }
+    .map-zoom button {
+      width: 36px;
+      height: 28px;
+      border: 1px solid #2a3f63;
+      background: #121c30;
+      color: #d5e2f5;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0;
+    }
+    .map-zoom button:hover {
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+    .map-zoom #map-zoom-reset { font-size: 11px; }
+    .city-hit { cursor: pointer; }
+    .city-dot { fill: #c5d4ef; }
+    .city-hit.active .city-dot { fill: #e8b86d; }
+    .city-name { fill: #9eb4d4; font-size: 13px; pointer-events: none; }
+    .city-hit.active .city-name { fill: #fff; font-weight: 700; }
+    .city-hit.optional:not(.in-trip) .city-dot {
+      fill: #0b1220;
+      stroke: #e8b86d;
+      stroke-width: 2;
+      stroke-dasharray: 3 2;
+    }
+    .city-hit.optional:not(.in-trip) .city-name { fill: #6b82a8; }
+    .plus { fill: #e8b86d; font-size: 12px; font-weight: 700; pointer-events: none; }
+    .city-hit.in-trip .plus { display: none; }
+    .hit { fill: transparent; }
+    .path-land { fill: none; stroke: #f59e0b; stroke-width: 3; }
+    .path-boat { fill: none; stroke: #22d3ee; stroke-width: 4; stroke-dasharray: 7 6; }
+    .path-back { fill: none; stroke: #a78bfa; stroke-width: 3; }
+    .river { fill: none; stroke: #1e4a7a; stroke-width: 10; opacity: 0.35; }
+    .seg { opacity: 0.22; }
+    .seg.active { opacity: 1; }
+    .legend, .extras-label {
+      display: flex;
+      gap: 14px;
+      font-size: 12px;
+      color: #8aa0c0;
+    }
+    .legend i {
+      display: inline-block;
+      width: 16px;
+      height: 3px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .legend .l-land { background: #f59e0b; }
+    .legend .l-boat { background: #22d3ee; }
+    .legend .l-rail { background: #a78bfa; }
+    .legend .l-sight { background: #34d399; height: 8px; width: 8px; border-radius: 50%; }
+    .legend #tog-sights {
+      margin-left: auto;
+      border: 1px solid #34d399;
+      background: transparent;
+      color: #34d399;
+      padding: 3px 10px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .legend #tog-sights.on {
+      background: #34d399;
+      color: #0b1220;
+    }
+    .sight-mark { display: none; cursor: pointer; }
+    .app.show-sights .sight-mark { display: inline; }
+    .app.show-sights .sight-mark.off-trip { display: none; }
+    .sight-pin { fill: #34d399; stroke: #0b1220; stroke-width: 1; }
+    .sight-label {
+      fill: #6ee7b7;
+      font-size: 10px;
+      pointer-events: none;
+    }
+    .app.show-sights .sight-mark.today .sight-pin { fill: #e8b86d; }
+    .app.show-sights .sight-mark.today .sight-label { fill: #fde68a; font-weight: 700; }
+    .extras-label { margin: 4px 0 0; }
+    .extra-btns { display: flex; gap: 8px; }
+    .extra-btns button {
+      flex: 1;
+      border: 1px dashed #e8b86d;
+      background: transparent;
+      color: #e8b86d;
+      padding: 8px 6px;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .extra-btns button.on {
+      border-style: solid;
+      background: #e8b86d;
+      color: #0b1220;
+    }
+    .trip {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+      padding: 0;
+    }
+    .week {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      flex-shrink: 0;
+      margin: 0;
+      padding: 18px 28px 12px;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+      z-index: 8;
+    }
+    .trip-scroll {
+      flex: 1;
+      overflow: auto;
+      padding: 16px 28px 40px;
+    }
+    .week button {
+      border: 1px solid var(--line);
+      background: var(--card);
+      text-align: left;
+      padding: 0;
+      cursor: pointer;
+      color: var(--ink);
+      overflow: hidden;
+    }
+    .week button.on {
+      background: #12263f;
+      color: #e8eef8;
+      border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.22);
+    }
+    .week .d-pip { height: 4px; background: transparent; }
+    .week .d-pip.high { background: #fb7185; }
+    .week .d-pip.mid { background: #f59e0b; }
+    .week .d-pip.low { background: #34d399; }
+    .week .d-body { padding: 8px 10px 10px; }
+    .week .d-num { font-size: 11px; letter-spacing: 0.08em; opacity: 0.7; }
+    .week .d-city { font-size: 16px; font-weight: 700; margin-top: 4px; }
+    .week .d-how { font-size: 12px; margin-top: 3px; opacity: 0.75; }
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    .hero-kicker {
+      margin: 0 0 6px;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      color: var(--mute);
+    }
+    .hero-meta {
+      display: flex;
+      gap: 18px;
+      flex-shrink: 0;
+    }
+    .hero-meta .stat {
+      text-align: right;
+      font-size: 12px;
+      color: var(--mute);
+    }
+    .hero-meta .stat b {
+      display: block;
+      margin-top: 2px;
+      color: #e8eef8;
+      font-size: 18px;
+      font-family: "STSong", "SimSun", serif;
+      font-weight: 600;
+    }
+    .hero-meta .stat b.high { color: var(--alert); }
+    .hero-meta .stat b.mid { color: var(--land); }
+    .hero-meta .stat b.low { color: var(--mint); }
+    .board {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(260px, 320px);
+      gap: 22px;
+      align-items: start;
+    }
+    .side { display: flex; flex-direction: column; gap: 12px; }
+    .jam-list { display: flex; flex-direction: column; }
+    .jam-item {
+      padding: 9px 0 9px 10px;
+      border-left: 2px solid var(--alert);
+      border-bottom: 1px solid var(--line);
+    }
+    .jam-item:first-child { padding-top: 0; }
+    .jam-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .jam-item.mid { border-left-color: var(--land); }
+    .jam-item.low { border-left-color: var(--mint); }
+    .jam-item .spot { font-size: 13px; font-weight: 700; color: #e8eef8; }
+    .jam-item .when { font-size: 12px; color: var(--land); margin-top: 2px; }
+    .jam-item .avoid { font-size: 12px; color: var(--mute); margin-top: 4px; line-height: 1.5; }
+    .jam-mark { fill: #fb7185; opacity: 0.28; cursor: pointer; }
+    .jam-mark.on { opacity: 1; }
+    .mode-train .jam-mark { display: none; }
+    .mode-train .legend-jam { display: none; }
+    .mode-drive #train-box { display: none; }
+    .mode-train #traffic-box { display: none; }
+    .mode-train .board { grid-template-columns: minmax(0, 1.2fr) minmax(260px, 320px); }
+    .train-item {
+      padding: 9px 0 9px 10px;
+      border-left: 2px solid var(--rail);
+      border-bottom: 1px solid var(--line);
+    }
+    .train-item:first-child { padding-top: 0; }
+    .train-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .train-item .no { font-size: 15px; font-weight: 700; color: #c4b5fd; letter-spacing: 0.04em; }
+    .train-item .run { font-size: 13px; color: #e8eef8; margin-top: 2px; }
+    .train-item .tip { font-size: 12px; color: var(--mute); margin-top: 4px; line-height: 1.5; }
+    .hero h2 {
+      font-family: "STSong", "SimSun", serif;
+      font-size: 30px;
+      margin: 0;
+      line-height: 1.25;
+    }
+    .stay {
+      text-align: right;
+      font-size: 13px;
+      color: var(--mute);
+      white-space: nowrap;
+    }
+    .stay b {
+      display: block;
+      color: var(--gold);
+      font-size: 22px;
+      font-family: "STSong", "SimSun", serif;
+      font-weight: 600;
+    }
+    .flow {
+      position: relative;
+      margin: 0;
+      padding-left: 92px;
+    }
+    .flow::before {
+      content: "";
+      position: absolute;
+      left: 78px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: var(--line);
+    }
+    .block {
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 11px 14px 11px 16px;
+      margin-bottom: 8px;
+    }
+    .block .time {
+      position: absolute;
+      left: -92px;
+      top: 14px;
+      width: 70px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .block .dot {
+      position: absolute;
+      left: -18px;
+      top: 18px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--land);
+      border: 2px solid var(--paper);
+    }
+    .block.boat .dot { background: var(--boat); }
+    .block.rail .dot { background: var(--rail); }
+    .block.city .dot { background: var(--gold); }
+    .block.eat .dot { background: var(--eat); }
+    .block.stay .dot { background: var(--gold); }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      padding: 2px 7px;
+      margin-bottom: 6px;
+      color: #fff;
+      background: var(--land);
+    }
+    .block.boat .tag { background: var(--boat); color: #0b1220; }
+    .block.rail .tag { background: var(--rail); }
+    .block.city .tag { background: #b45309; }
+    .block.eat .tag { background: #c2410c; }
+    .block.stay .tag { background: #a16207; }
+    .block h3 { margin: 0 0 4px; font-size: 15px; color: #e8eef8; }
+    .block p { margin: 0; color: #a8b8d4; font-size: 13px; line-height: 1.55; }
+    .box {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 14px 16px;
+    }
+    .box h4 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      color: #8aa0c0;
+      font-weight: 600;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chips span {
+      border: 1px solid var(--line);
+      padding: 4px 8px;
+      font-size: 12px;
+      background: transparent;
+      color: #d5e2f5;
+    }
+    #eat span {
+      border-color: rgba(251, 146, 60, 0.45);
+      color: #fdba74;
+    }
+    #local span {
+      border-color: rgba(52, 211, 153, 0.4);
+      color: #6ee7b7;
+    }
+    .taste-row + .taste-row {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+    .taste-row h4 { margin-bottom: 8px; }
+    .hotel-box { border-color: rgba(232, 184, 109, 0.45); }
+    .hotel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .hotel-box h4 { margin: 0; color: #e8b86d; }
+    .hotel-city {
+      font-size: 13px;
+      color: #fdba74;
+      white-space: nowrap;
+    }
+    .hotel-name {
+      margin: 0 0 12px;
+      font-size: 22px;
+      font-family: "STSong", "SimSun", serif;
+      color: #e8b86d;
+      font-weight: 600;
+    }
+    .hotel-name.empty {
+      border-bottom: 1px dashed rgba(232, 184, 109, 0.7);
+      display: inline-block;
+      padding-bottom: 2px;
+    }
+    .hotel-grid {
+      display: grid;
+      grid-template-columns: 2.4em 1fr;
+      gap: 8px 10px;
+      align-items: start;
+    }
+    .hotel-grid span {
+      font-size: 12px;
+      color: var(--mute);
+      padding-top: 1px;
+    }
+    .hotel-grid p {
+      margin: 0;
+      font-size: 13px;
+      color: #d5e2f5;
+      line-height: 1.5;
+    }
+    .sights { display: flex; flex-direction: column; gap: 8px; }
+    .sight-card {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 0 10px;
+      width: 100%;
+      padding: 0;
+      border: 1px solid var(--line);
+      background: #0b1220;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .sight-card:hover { border-color: var(--mint); }
+    .sight-card img {
+      width: 92px;
+      height: 98px;
+      object-fit: cover;
+      display: block;
+      grid-row: 1 / span 4;
+    }
+    .sight-card .s-name {
+      margin: 8px 8px 0 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .sight-card .s-tag {
+      margin: 2px 8px 0 0;
+      font-size: 12px;
+      color: var(--mint);
+    }
+    .sight-card .s-price {
+      margin: 2px 8px 0 0;
+      font-size: 12px;
+      color: var(--gold);
+    }
+    .sight-card .s-dist {
+      margin: 2px 8px 8px 0;
+      font-size: 12px;
+      color: #8aa0c0;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: rgba(5, 10, 20, 0.82);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal.on { display: flex; }
+    .modal-card {
+      width: min(720px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      background: var(--card);
+      border: 1px solid var(--line);
+    }
+    .modal-card img {
+      width: 100%;
+      height: 340px;
+      object-fit: cover;
+      display: block;
+      background: #0b1220;
+    }
+    .modal-body { padding: 16px 18px 20px; }
+    .modal-kicker {
+      margin: 0 0 6px;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      color: var(--mint);
+    }
+    .modal-body h3 {
+      margin: 0 0 10px;
+      font-size: 24px;
+      font-family: "STSong", "SimSun", serif;
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .modal-facts {
+      display: flex;
+      flex-direction: column;
+      margin: 0 0 14px;
+      border: 1px solid rgba(232, 184, 109, 0.4);
+      background: rgba(232, 184, 109, 0.07);
+    }
+    .modal-fact {
+      display: grid;
+      grid-template-columns: 2.4em 1fr;
+      gap: 8px 10px;
+      padding: 10px 12px;
+      align-items: start;
+    }
+    .modal-fact + .modal-fact {
+      border-top: 1px solid rgba(42, 63, 99, 0.85);
+    }
+    .modal-fact > span {
+      font-size: 12px;
+      color: var(--mute);
+      padding-top: 4px;
+    }
+    .modal-fact b {
+      display: block;
+      color: #e8b86d;
+      font-size: 20px;
+      font-family: "STSong", "SimSun", serif;
+      font-weight: 600;
+    }
+    .modal-fact.dist b { color: #34d399; }
+    .modal-fact p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: #a8b8d4;
+      line-height: 1.55;
+    }
+    .modal-body p {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: #d5e2f5;
+      line-height: 1.7;
+    }
+    .modal-body .modal-tip { color: #8aa0c0; font-size: 13px; }
+    .modal-close {
+      float: right;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--ink);
+      padding: 4px 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .note {
+      margin: 0;
+      padding: 12px 14px;
+      border-left: 3px solid var(--mint);
+      background: #0b1220;
+      font-size: 13px;
+      color: #a8b8d4;
+      line-height: 1.6;
+    }
+    .refs-btn {
+      flex-shrink: 0;
+      align-self: flex-start;
+      margin-top: 2px;
+      border: 0;
+      background: transparent;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      padding: 0;
+    }
+    .refs-btn:hover { color: #7dd3fc; }
+    .refs-card {
+      width: min(1080px, 94vw);
+      max-height: min(88vh, 900px);
+    }
+    .refs-body {
+      padding: 22px 28px 26px;
+      font-size: 13px;
+      color: #8aa0c0;
+    }
+    .refs-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    .refs-head .modal-close { float: none; flex-shrink: 0; }
+    .refs-head h3 { margin: 0; }
+    .refs-head .modal-kicker { margin: 0 0 6px; }
+    .refs-body > p { margin: 0 0 12px; line-height: 1.65; }
+    .refs-body a { color: var(--gold); }
+    .boat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin: 0 0 16px;
+    }
+    .boat-line {
+      margin: 0;
+      padding: 14px 16px;
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      background: rgba(34, 211, 238, 0.06);
+    }
+    .boat-line h5 {
+      margin: 0 0 10px;
+      color: #22d3ee;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .boat-line dl {
+      margin: 0;
+      display: grid;
+      grid-template-columns: 2.6em 1fr;
+      gap: 8px 10px;
+    }
+    .boat-line dt { color: #6b82a8; padding-top: 1px; }
+    .boat-line dd { margin: 0; color: #d5e2f5; line-height: 1.55; }
+    .refs-notes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 24px;
+    }
+    .refs-notes p { margin: 0; color: #a8b8d4; }
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 1fr; height: auto; }
+      .split { width: auto; height: 1px; }
+      .map-side { height: auto; position: relative; }
+      .map-wrap { height: 280px; }
+      .trip { height: auto; overflow: visible; }
+      .week {
+        grid-template-columns: repeat(4, 1fr);
+        position: sticky;
+        top: 0;
+      }
+      .trip-scroll { overflow: visible; }
+      .board, .hero { grid-template-columns: 1fr; display: block; }
+      .side { margin-top: 16px; max-width: 520px; }
+      .hero-meta { margin-top: 12px; justify-content: flex-start; }
+      .hero-meta .stat { text-align: left; }
+      .stay { text-align: left; margin-top: 8px; }
+      .boat-grid, .refs-notes { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .week { grid-template-columns: repeat(2, 1fr); }
+      .flow { padding-left: 72px; }
+      .block .time { width: 56px; left: -72px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app mode-drive" id="app">
+    <aside class="map-side">
+      <p class="kicker">2026 · 10.1–10.6</p>
+      <h1>三峡环线</h1>
+      <p class="sub" id="sub"></p>
+      <div class="modes">
+        <button id="btn-drive" class="on" type="button">自驾</button>
+        <button id="btn-train" type="button">火车</button>
+      </div>
+      <div class="map-wrap" id="map-wrap">
+        <svg id="route-map" viewBox="0 0 640 360" role="img" aria-label="环线示意">
+          <path class="river" vector-effect="non-scaling-stroke" d="M70 128 C 180 108, 260 108, 340 128 S 500 175, 610 195"/>
+          <path id="seg-wj" class="path-land seg" vector-effect="non-scaling-stroke" d="M590 198 L 500 210"/>
+          <path id="seg-je" class="path-land seg" vector-effect="non-scaling-stroke" d="M500 210 L 220 268"/>
+          <path id="seg-ef" class="path-land seg" vector-effect="non-scaling-stroke" d="M220 268 L 108 132"/>
+          <path id="seg-fy" class="path-land seg" vector-effect="non-scaling-stroke" d="M108 145 C 220 190, 320 185, 402 168"/>
+          <path id="seg-fb" class="path-land seg" vector-effect="non-scaling-stroke" d="M108 145 C 170 160, 230 155, 278 138"/>
+          <path id="seg-fw" class="path-boat seg" vector-effect="non-scaling-stroke" d="M108 132 L 188 122"/>
+          <path id="seg-wb" class="path-boat seg" vector-effect="non-scaling-stroke" d="M188 122 L 278 138"/>
+          <path id="seg-wy" class="path-back seg" vector-effect="non-scaling-stroke" d="M188 128 C 260 150, 340 160, 402 168"/>
+          <path id="seg-by" class="path-back seg" vector-effect="non-scaling-stroke" d="M278 138 L 402 168"/>
+          <path id="seg-yw" class="path-back seg" vector-effect="non-scaling-stroke" d="M402 168 L 590 198"/>
+          <g class="jam-mark" data-jam="jam-exit" data-jump="wuhan" transform="translate(558,198)">
+            <polygon points="0,-7 6,0 0,7 -6,0"/><title>汉蔡 / 蔡甸出城</title>
+          </g>
+          <g class="jam-mark" data-jam="jam-xian" data-jump="jingzhou" transform="translate(470,214)">
+            <polygon points="0,-7 6,0 0,7 -6,0"/><title>G50 仙桃–荆州</title>
+          </g>
+          <g class="jam-mark" data-jam="jam-bridge" data-jump="enshi" transform="translate(372,228)">
+            <polygon points="0,-7 6,0 0,7 -6,0"/><title>宜昌长江公路大桥</title>
+          </g>
+          <g class="jam-mark" data-jam="jam-yesan" data-jump="enshi" transform="translate(292,250)">
+            <polygon points="0,-7 6,0 0,7 -6,0"/><title>野三河 / 恩施段</title>
+          </g>
+          <g class="jam-mark" data-jam="jam-s233" data-jump="fengjie" transform="translate(168,210)">
+            <polygon points="0,-7 6,0 0,7 -6,0"/><title>S233 大峡谷 / 巫恩公路</title>
+          </g>
+          <g class="jam-mark" data-jam="jam-g42" data-jump="yichang" transform="translate(338,175)">
+            <polygon points="0,-7 6,0 0,7 -6,0"/><title>G42 宜巴 / 当阳</title>
+          </g>
+          <g class="jam-mark" data-jam="jam-dam" data-jump="yichang" transform="translate(392,160)">
+            <polygon points="0,-7 6,0 0,7 -6,0"/><title>冯家湾 / 三峡专用公路</title>
+          </g>
+          <g class="jam-mark" data-jam="jam-back" data-jump="wuhan" transform="translate(520,204)">
+            <polygon points="0,-7 6,0 0,7 -6,0"/><title>G50 潜江–仙桃返程</title>
+          </g>
+          <g class="city-hit" data-city="wuhan" transform="translate(590,198)">
+            <circle class="hit" r="18"/><circle class="city-dot" r="7"/><text class="city-name" x="10" y="5">武汉</text>
+          </g>
+          <g class="city-hit" data-city="jingzhou" transform="translate(500,210)">
+            <circle class="hit" r="16"/><circle class="city-dot" r="6"/><text class="city-name" x="8" y="16">荆州</text>
+          </g>
+          <g class="city-hit" data-city="enshi" transform="translate(220,268)">
+            <circle class="hit" r="16"/><circle class="city-dot" r="6"/><text class="city-name" x="-18" y="22">恩施</text>
+          </g>
+          <g class="city-hit" data-city="fengjie" transform="translate(108,132)">
+            <circle class="hit" r="16"/><circle class="city-dot" r="6"/><text class="city-name" x="-38" y="-10">奉节</text>
+          </g>
+          <g class="city-hit optional" data-city="wushan" transform="translate(188,122)">
+            <circle class="hit" r="18"/><circle class="city-dot" r="6"/>
+            <text class="plus" x="22" y="-11">+</text>
+            <text class="city-name" x="-14" y="-14">巫山</text>
+          </g>
+          <g class="city-hit optional" data-city="badong" transform="translate(278,138)">
+            <circle class="hit" r="18"/><circle class="city-dot" r="6"/>
+            <text class="plus" x="10" y="18">+</text>
+            <text class="city-name" x="10" y="-8">巴东</text>
+          </g>
+          <g class="city-hit" data-city="yichang" transform="translate(402,168)">
+            <circle class="hit" r="16"/><circle class="city-dot" r="6"/><text class="city-name" x="8" y="-8">宜昌</text>
+          </g>
+        </svg>
+        <div class="map-zoom" role="group" aria-label="地图缩放">
+          <button type="button" id="map-zoom-in" title="放大">+</button>
+          <button type="button" id="map-zoom-out" title="缩小">−</button>
+          <button type="button" id="map-zoom-reset" title="复位">复位</button>
+        </div>
+      </div>
+      <div class="legend">
+        <span><i class="l-land"></i>陆地</span>
+        <span><i class="l-boat"></i>水上公交</span>
+        <span><i class="l-rail"></i>回路</span>
+        <span class="legend-jam"><i class="l-jam"></i>国庆易堵点</span>
+        <span class="legend-sight"><i class="l-sight"></i>景点</span>
+        <button type="button" id="tog-sights">显示景点</button>
+      </div>
+      <p class="extras-label">时间不够，这两站默认不排。地图或按钮点一下即可加入。</p>
+      <div class="extra-btns">
+        <button type="button" id="tog-wushan">+ 巫山<br>小红船 / 三友包子</button>
+        <button type="button" id="tog-badong">+ 巴东<br>巫峡 / 茶店牛肉</button>
+      </div>
+      <button type="button" class="refs-btn" id="refs-open">参考资料</button>
+    </aside>
+    <div class="split" aria-hidden="true"></div>
+    <section class="trip">
+      <div class="week" id="week"></div>
+      <div class="trip-scroll">
+      <div class="hero">
+        <div>
+          <p class="hero-kicker" id="hero-kicker"></p>
+          <h2 id="title"></h2>
+        </div>
+        <div class="hero-meta" id="hero-meta"></div>
+      </div>
+      <div class="board">
+        <div class="flow" id="flow"></div>
+        <aside class="side">
+          <div class="box hotel-box">
+            <div class="hotel-head">
+              <h4>过夜酒店</h4>
+              <span class="hotel-city" id="hotel-city"></span>
+            </div>
+            <p class="hotel-name" id="hotel-name"></p>
+            <div class="hotel-grid">
+              <span>片区</span><p id="hotel-area"></p>
+              <span>理由</span><p id="hotel-why"></p>
+              <span>备注</span><p id="hotel-tip"></p>
+            </div>
+          </div>
+          <div class="box">
+            <h4>热门景点</h4>
+            <div class="sights" id="sights"></div>
+          </div>
+          <div class="box">
+            <div class="taste-row">
+              <h4>当天吃</h4>
+              <div class="chips" id="eat"></div>
+            </div>
+            <div class="taste-row">
+              <h4>当地</h4>
+              <div class="chips" id="local"></div>
+            </div>
+          </div>
+          <div class="box" id="traffic-box">
+            <h4>当天易堵</h4>
+            <div class="jam-list" id="jams"></div>
+          </div>
+          <div class="box" id="train-box">
+            <h4>当天车次</h4>
+            <div class="jam-list" id="trains"></div>
+          </div>
+          <div class="note" id="note"></div>
+        </aside>
+      </div>
+      </div>
+    </section>
+  </div>
+  <div class="modal" id="sight-modal" role="dialog" aria-modal="true" aria-labelledby="sight-title">
+    <div class="modal-card">
+      <img id="sight-img" alt="">
+      <div class="modal-body">
+        <button class="modal-close" id="sight-close" type="button">关闭</button>
+        <p class="modal-kicker" id="sight-kicker"></p>
+        <h3 id="sight-title"></h3>
+        <div class="modal-facts">
+          <div class="modal-fact">
+            <span>门票</span>
+            <div>
+              <b id="sight-price"></b>
+              <p id="sight-ticket"></p>
+            </div>
+          </div>
+          <div class="modal-fact dist">
+            <span>距离</span>
+            <div>
+              <b id="sight-dist"></b>
+              <p id="sight-dist-note"></p>
+            </div>
+          </div>
+        </div>
+        <p id="sight-intro"></p>
+        <p class="modal-tip" id="sight-tip"></p>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="refs-modal" role="dialog" aria-modal="true" aria-labelledby="refs-title">
+    <div class="modal-card refs-card">
+      <div class="modal-body refs-body">
+        <div class="refs-head">
+          <div>
+            <p class="modal-kicker">行程依据</p>
+            <h3 id="refs-title">参考资料</h3>
+          </div>
+          <button class="modal-close" id="refs-close" type="button">关闭</button>
+        </div>
+        <p>
+          赖导对照：
+          <a href="https://www.bilibili.com/video/BV1F9U8BzE3F/" target="_blank" rel="noopener">上集 奉节→巫山</a>
+          ·
+          <a href="https://www.bilibili.com/video/BV1TwS7BmETP/" target="_blank" rel="noopener">下集</a>
+        </p>
+        <div class="boat-grid">
+        <div class="boat-line">
+          <h5>小红船 · 奉节 → 巫山</h5>
+          <dl>
+            <dt>开船</dt>
+            <dd>奉节小红船码头。地图搜「小红船码头」，不要去宝塔坪。车停马路对面停车场，约 15 元/天。</dd>
+            <dt>下船</dt>
+            <dd>巫山古城码头。出码头就是县城，可步行到神女大扶梯。</dd>
+            <dt>班次</dt>
+            <dd>8:00、13:20 · 约 3.5 小时 · 约 40 元。船上扫码，不用预订。过白帝城、夔门、瞿塘峡。</dd>
+          </dl>
+        </div>
+        <div class="boat-line">
+          <h5>小红船 · 巫山 → 奉节</h5>
+          <dl>
+            <dt>开船</dt>
+            <dd>巫山古城码头。和去巴东共用一座码头，走右边回奉节的入口。</dd>
+            <dt>下船</dt>
+            <dd>奉节小红船码头。上岸有长台阶，行李可找棒棒。</dd>
+            <dt>班次</dt>
+            <dd>8:00、14:00 · 约 3.5 小时 · 约 40 元。</dd>
+          </dl>
+        </div>
+        <div class="boat-line">
+          <h5>巫山 → 巴东 · 小红船接小白船</h5>
+          <dl>
+            <dt>开船</dt>
+            <dd>巫山古城码头左边入口，牌上写「巫山–神女峰–培石」。右边是回奉节，别坐反。</dd>
+            <dt>换船</dt>
+            <dd>培石码头停约 1 小时，再开到鳊鱼溪，跳上湖北小白船。</dd>
+            <dt>下船</dt>
+            <dd>巴东巫峡码头。到江边县城，茶店牛肉在镇上，不是码头旁。</dd>
+            <dt>班次</dt>
+            <dd>约 8:00 · 约 5 小时 · 40+50 元，两段船上分别扫码。</dd>
+          </dl>
+        </div>
+        </div>
+        <div class="refs-notes">
+        <p>自驾拥堵点依据近年湖北国庆出行提示和景区交警通报，出发前以实时路况为准。</p>
+        <p>火车车次为近期时刻，国庆放假以 12306 当天为准，购票时核对站名：汉口 / 荆州 / 恩施 / 宜昌东。</p>
+        <p>门票为近期旺季公示价，国庆以景区当天为准。黄鹤楼须预约；恩施大峡谷索道、景交另计；三峡大坝免门票，观光车另购；两坝一峡套票提前订。</p>
+        <p>景点距离为相对当晚住宿城市的公路或水路约数，不是直线。恩施大峡谷、三峡大坝按车程预留；神女峰、巫峡按水上公交。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const DATES = [
+      { date: "10/1", week: "周四" },
+      { date: "10/2", week: "周五" },
+      { date: "10/3", week: "周六" },
+      { date: "10/4", week: "周日" },
+      { date: "10/5", week: "周一" },
+      { date: "10/6", week: "周二" }
+    ];
+
+    const state = { mode: "drive", day: 0, wushan: false, badong: false, showSights: false };
+
+    const CITY_IDS = {
+      "武汉": "wuhan", "荆州": "jingzhou", "恩施": "enshi", "奉节": "fengjie",
+      "巫山": "wushan", "巴东": "badong", "宜昌": "yichang"
+    };
+
+    const HOTELS = {
+      wuhan: {
+        city: "武汉", area: "汉口或家", name: "不订", empty: false,
+        why: "1 日清晨出城，6 日返程直接回家。",
+        tip: "若晚到汉可临时订汉口近地铁，不是行程刚需。"
+      },
+      jingzhou: {
+        city: "荆州", area: "古城东门–金凤门步行圈", name: "待定", empty: true,
+        why: "走路登城墙，少开车找车位。",
+        tip: "10/1 过夜。避开高速口商务酒店。"
+      },
+      enshi: {
+        city: "恩施", area: "市区 / 土司城或女儿城附近", name: "待定", empty: true,
+        why: "次日早进大峡谷，不要住进山民宿。",
+        tip: "火车版 10/2–10/3 连住两晚。"
+      },
+      fengjie: {
+        city: "奉节", area: "江边县城；坐小红船则码头对面", name: "待定", empty: true,
+        why: "方便白帝城或明早登船。不要住高铁站。",
+        tip: "加巫山时车可停码头停车场，约 15 元/天。"
+      },
+      wushan: {
+        city: "巫山", area: "古城码头 / 神女大扶梯步行圈", name: "待定", empty: true,
+        why: "车留奉节。能走到江边、烤鱼店和三友包子最好。",
+        tip: "明早去三友包子，早点排队。若坐巫峡船，订能走到左边入口的。"
+      },
+      badong: {
+        city: "巴东", area: "江边 / 巫峡口", name: "待定", empty: true,
+        why: "方便次日大巴或取车。茶店牛肉在附近。",
+        tip: "自驾经巴东若当晚赶宜昌，这晚可不订。"
+      },
+      yichang: {
+        city: "宜昌", area: "三峡游客中心 / 两坝一峡集合点", name: "待定", empty: true,
+        why: "少穿城。有大坝就住游客中心步行圈。",
+        tip: "国庆两坝一峡套票提前 10–15 天。"
+      }
+    };
+
+    const SIGHTS = {
+      wuhan: [
+        {
+          name: "黄鹤楼", tag: "武汉地标", img: "spots/spot-wuhan-huanghelou.png", mx: 568, my: 176,
+          ticket: "70 元",
+          ticketNote: "日场全票 70 元，半票 35 元。夜场另购，国庆约 150 元。日夜场不通用，须预约。",
+          dist: "市内",
+          distNote: "武昌蛇山。距汉口约 8 公里，和长江大桥可步行串联。",
+          intro: "蛇山上的黄鹤楼是江南三大名楼之一。现存楼为 1985 年重建，外观五层、内里九层，可远眺长江和龟山。崔颢「昔人已乘黄鹤去」写的就是这里。",
+          tip: "返汉若时间够，可顺路上看江。国庆人多，尽量傍晚去。"
+        },
+        {
+          name: "武汉长江大桥", tag: "江上第一桥", img: "spots/spot-wuhan-bridge.png", mx: 548, my: 218,
+          ticket: "免费",
+          ticketNote: "桥头、江边观景不收门票。不必单独买票排队。",
+          dist: "市内",
+          distNote: "紧邻黄鹤楼，武昌桥头步行约 1 公里。路过即可，不必另开一趟。",
+          intro: "1957 年通车的长江第一座公铁两用桥，一端连黄鹤楼所在的蛇山。从桥头或黄鹤楼望过去，江面、桥身和楼阁叠在一起，是武汉最常见的江景。",
+          tip: "适合路过看看，不必单独排半天。"
+        }
+      ],
+      jingzhou: [
+        {
+          name: "荆州古城墙", tag: "保存最完整的古城之一", img: "spots/spot-jingzhou-wall.png", mx: 458, my: 198,
+          ticket: "约 40 元",
+          ticketNote: "东门宾阳楼段常见约 40 元。历史文化区套票约 115 元，含宾阳楼等。部分墙段可免费远观。",
+          dist: "市内",
+          distNote: "东门宾阳楼就在古城内，住古城附近可步行或骑行上墙。",
+          intro: "现存城墙多为明清砖城，周长约 10.5 公里，东门可上墙。向宾阳楼、金凤门走或骑行，护城河就在脚下。楚都江陵的轮廓，今天还能走一圈。",
+          tip: "东门上墙最方便。国庆正午晒，上午或傍晚更合适。"
+        },
+        {
+          name: "关帝庙", tag: "三国 · 关羽镇荆州", img: "spots/spot-jingzhou-guandi.png", mx: 528, my: 192,
+          ticket: "免费",
+          ticketNote: "多数时候免费开放。若买了古城套票，一般也含这一站。",
+          dist: "市内",
+          distNote: "南门内，距东门约 1.5 公里。下城后和九鼎街连着逛，不用再开车。",
+          intro: "关羽镇守荆州十余年，南门内关帝庙被认为是全国较早的关庙之一。和九鼎街连在一起逛，下城之后不用再开车。",
+          tip: "和古城墙排在同一天下午。小胡鸭真空装可在附近买。"
+        }
+      ],
+      enshi: [
+        {
+          name: "恩施大峡谷", tag: "喀斯特峰丛", img: "spots/spot-enshi-canyon.png", mx: 168, my: 248,
+          ticket: "105 元起",
+          ticketNote: "国庆旺季七星寨 105 元。景交+缆车 50 元，索道上行另 105 元。半日精华大约 200–260 元/人。云龙地缝另加 50 元。",
+          dist: "约 60 公里",
+          distNote: "距恩施市区约 60 公里，走 S233。平时约 1.5 小时，国庆进山路按 2 小时预留。",
+          intro: "清江流域的喀斯特峡谷，七星寨看一炷香、绝壁长廊是精华。自驾只排半日，火车版可以加上云龙地缝。国庆务必预约，进山路很堵。",
+          tip: "智游恩施 / 游湖北提前预约。7:30 到游客中心，14:00 必须离开。"
+        },
+        {
+          name: "土司城", tag: "土家吊脚楼", img: "spots/spot-enshi-tusi.png", mx: 252, my: 252,
+          ticket: "约 45 元",
+          ticketNote: "恩施城里的土司城，不是咸丰唐崖土司城。傍晚去女儿城夜市通常不用另买门票。",
+          dist: "市内",
+          distNote: "城南土司城，距市区约 3 公里，车程约 10 分钟。不要和咸丰唐崖搞混。",
+          intro: "恩施城里看土家族吊脚楼的地方。刚进山的当天下午只排这一个点；太晚就改女儿城夜市逛吃，不要两头跑。",
+          tip: "住市区或土司城附近，不要住进山民宿，明早还要出城去峡谷。"
+        }
+      ],
+      fengjie: [
+        {
+          name: "白帝城", tag: "诗城 · 托孤", img: "spots/spot-fengjie-baidi.png", mx: 72, my: 152,
+          ticket: "100 元",
+          ticketNote: "旺季 3/1–10/30 为 100 元，淡季 60 元。国庆按旺季。观夔门含在景区里。",
+          dist: "约 10 公里",
+          distNote: "县城以东约 10 余公里，车程约 20–30 分钟。观夔门含在景区里。",
+          intro: "瞿塘峡口的白帝城，李白「朝辞白帝彩云间」写的就是这儿。水位抬升后城在岛上，江在脚下。托孤堂、观夔门是必看。刘备托孤的故事也锚在这里。",
+          tip: "早点进。若要赶 13:20 小红船，必须留足下山回码头的时间。"
+        },
+        {
+          name: "夔门", tag: "瞿塘峡西口", img: "spots/spot-fengjie-kuimen.png", mx: 128, my: 112,
+          ticket: "不含单独票",
+          ticketNote: "白帝城上可以看。坐小红船过瞿塘峡时甲板上也能看，船票约 40 元。",
+          dist: "约 10 公里",
+          distNote: "与白帝城同在瞿塘峡口。县城开车约 20–30 分钟，或小红船过峡时甲板上可见。",
+          intro: "长江在此被两岸绝壁收成一道门，是三峡最短也最险的瞿塘峡入口。十元纸币背面那座门，指的就是夔门。船上或白帝城高处都能看见。",
+          tip: "坐小红船过瞿塘峡时，站在甲板上对着夔门看一遍。"
+        }
+      ],
+      wushan: [
+        {
+          name: "神女峰", tag: "巫山十二峰", img: "spots/spot-wushan-shennv.png", mx: 152, my: 102,
+          ticket: "随船",
+          ticketNote: "江上看峰不另买门票。巫山→巴东水上公交约 40+50 元（鳊鱼溪换小白船）才能看到正脸。",
+          dist: "水路约 15 公里",
+          distNote: "巫峡中段，距巫山县城水路约 15 公里。坐水上公交约 1 小时可见正脸，县城里的雕塑不能代替。",
+          intro: "巫峡十二峰里最出名的一座，江上看像一位立在崖上的神女。要看真峰，得坐巫山到巴东的水上公交，走左边入口（巫山–神女峰–培石）。",
+          tip: "不加巴东就看不到神女峰正脸。县城里的神女雕塑不能代替。"
+        },
+        {
+          name: "神女大扶梯", tag: "8D 山城", img: "spots/spot-wushan-city.png", mx: 218, my: 140,
+          ticket: "约 3 元",
+          ticketNote: "单程约 3 元，刷卡或扫码即可。梯坎本身免费。",
+          dist: "市内",
+          distNote: "巫山县城坡上，江边码头步行或坐扶梯即到。",
+          intro: "移民后的巫山贴着江岸建在坡上，神女大扶梯约 3 元，是城里最省事的上下坡方式。扶梯、梯坎、江边连在一起走，就是赖导上集里的日常。",
+          tip: "傍晚到岸先坐扶梯，晚饭吃烤鱼。早点铺三友包子留到第二天早上。"
+        }
+      ],
+      badong: [
+        {
+          name: "巫峡", tag: "三峡最长一段", img: "spots/spot-badong-wuxia.png", mx: 238, my: 118,
+          ticket: "约 90 元",
+          ticketNote: "水上公交：巫山段约 40 元，鳊鱼溪换小白船约 50 元，合计约 90 元。船票船上扫码，不用预订。",
+          dist: "水路约 40 公里",
+          distNote: "巫山到巴东的船程约 40 多公里、约 5 小时。巴东县城就在峡口，不是再开车进山。",
+          intro: "巫峡约 40 多公里，在三峡里最长，两岸十二峰常年有云雾。赖导下集走的就是这条水上公交：巫山左边入口，鳊鱼溪换小白船到巴东。",
+          tip: "约 5 小时，40+50 元。没有巫山过夜，赶不上早上 8:00 那班。"
+        },
+        {
+          name: "巫峡口", tag: "巴东江关", img: "spots/spot-badong-town.png", mx: 308, my: 156,
+          ticket: "免费",
+          ticketNote: "江边、县城观景不收门票。茶店牛肉是吃饭，不是景区票。",
+          dist: "市内",
+          distNote: "巴东县城即巫峡口。高铁巴东站在山上，到江边还要 50–70 分钟。",
+          intro: "巴东贴在巫峡口的山坡上，过了峡就能看见江关。茶店牛肉是这站的理由。郑渝高铁巴东站在山上，到江边还要 50–70 分钟，别按平原距离估。",
+          tip: "午饭控制在 1 小时。若当晚赶宜昌，这晚可以不订酒店。"
+        }
+      ],
+      yichang: [
+        {
+          name: "三峡大坝", tag: "两坝一峡", img: "spots/spot-yichang-dam.png", mx: 358, my: 152,
+          ticket: "观光车 35 元",
+          ticketNote: "大坝景区免门票，坛子岭等点之间观光车 35 元。走两坝一峡一日游套票约 258 元，含船过葛洲坝、西陵峡和上坝。",
+          dist: "约 40 公里",
+          distNote: "夷陵三斗坪，距宜昌市区约 40 公里，车程约 1 小时。距葛洲坝约 38 公里。",
+          intro: "世界上装机容量最大的水电站，坝顶长约 2.3 公里。坛子岭、185 平台是观坝点。两坝一峡套票会把你送到坝区，提前 10–15 天预约。",
+          tip: "冯家湾检查站国庆易堵。优先张太高速 / 翻坝高速进坝。"
+        },
+        {
+          name: "葛洲坝", tag: "西陵峡入口", img: "spots/spot-yichang-gezhouba.png", mx: 432, my: 188,
+          ticket: "套票约 258 元",
+          ticketNote: "不单卖进坝票。经典两坝一峡一日游约 258 元，含过葛洲坝船闸、西陵峡和三峡大坝。提前 10–15 天订。",
+          dist: "约 5 公里",
+          distNote: "西陵区，距宜昌主城约 4–6 公里。两坝一峡从这里过闸再进西陵峡。",
+          intro: "两坝一峡先过葛洲坝船闸，再进西陵峡，最后上三峡大坝。赖导说的西陵峡，指的就是这一段，不是奉节那班小红船。船闸延误时有发生。",
+          tip: "带身份证，游客中心集合。火车返汉不要买 18:30 以前的票。"
+        }
+      ]
+    };
+
+    function stamp(i, extra) {
+      return Object.assign({ date: DATES[i].date, week: DATES[i].week }, extra);
+    }
+
+    function driveDays() {
+      const w = state.wushan;
+      const b = state.badong;
+      const list = [];
+
+      list.push(stamp(0, {
+        city: "荆州", how: "G50 自驾", stay: "荆州",
+        title: "武汉出城，先把荆州古城走热",
+        segs: ["seg-wj"], cities: ["wuhan", "jingzhou"],
+        blocks: [
+          { time: "06:30", kind: "land", tag: "车", title: "武汉出发", text: "G50 沪渝高速约 230 公里。国庆按 3.5–4.5 小时预留，越早越顺。" },
+          { time: "10:30", kind: "eat", tag: "吃", title: "到荆州先吃早堂面", text: "古城边找一家老面馆。鱼糕可配着点，把午饭提前。" },
+          { time: "12:00", kind: "city", tag: "城", title: "东门上古城墙", text: "向宾阳楼、金凤门走或骑行。国庆城墙人多，避开正午最晒的一段。" },
+          { time: "15:00", kind: "city", tag: "逛", title: "九鼎街、关帝庙", text: "下城沿护城河逛。小胡鸭真空装，返程再买也行。" },
+          { time: "17:30", kind: "stay", tag: "住", title: "入住古城步行圈", text: "酒店订东门–金凤门一带，晚上不再开车。" },
+          { time: "19:00", kind: "eat", tag: "吃", title: "晚饭：千张扣肉 / 八宝饭", text: "荆州三宝今晚吃正餐。明天早走，别喝太晚。" }
+        ],
+        eat: ["鱼糕", "千张扣肉", "八宝饭", "早堂面"],
+        local: ["楚都", "护城河", "小胡鸭可带走"],
+        km: "230 km",
+        traffic: {
+          level: "high", label: "高", peak: "10/1 09:00–13:00 出城",
+          jams: ["jam-exit", "jam-xian"],
+          points: [
+            { spot: "汉蔡高速 / 蔡甸、琴台站", when: "9:00–12:00 离汉峰值", avoid: "6:30 前上高速。历年出城最堵的就是这一段。" },
+            { spot: "武汉绕城蔡甸段", when: "9/30 16–19 时、10/1 上午", avoid: "优先汉蔡接 G50，少在绕城里耗。" },
+            { spot: "G50 仙桃–荆州", when: "沪渝高速仙桃、荆州段风险高", avoid: "畅通路况 2.5 小时，国庆按 4–4.5 小时预留。" }
+          ]
+        },
+        note: "高速免费 10/1 0:00 至 10/7 24:00，7 座及以下，以免下匝道时间为准。"
+      }));
+
+      list.push(stamp(1, {
+        city: "恩施", how: "山区高速", stay: "恩施",
+        title: "离开平原，钻进鄂西山里",
+        segs: ["seg-je"], cities: ["jingzhou", "enshi"],
+        blocks: [
+          { time: "07:30", kind: "eat", tag: "吃", title: "早饭后离开荆州", text: "酒店退房。油加满，进山后服务区容易排队。" },
+          { time: "08:00", kind: "land", tag: "车", title: "荆州 → 恩施", text: "继续 G50，约 310 公里。过宜昌长江公路大桥后进山，按 5.5–6.5 小时预留。" },
+          { time: "12:00", kind: "eat", tag: "吃", title: "服务区或长阳简餐", text: "不要卡在桥上找饭。过桥前或高家堰附近解决。" },
+          { time: "15:30", kind: "land", tag: "车", title: "野三河段减速", text: "桥隧群，国庆易堵。天黑前进城比赶景点重要。" },
+          { time: "16:30", kind: "city", tag: "城", title: "土司城", text: "只排这一个点看吊脚楼。太晚就改女儿城，不要两头跑。" },
+          { time: "18:30", kind: "stay", tag: "住", title: "入住恩施市区", text: "住市区或土司城/女儿城附近。不要住进山民宿，明早要出城去大峡谷。" },
+          { time: "20:00", kind: "eat", tag: "吃", title: "女儿城夜市", text: "社饭、炕土豆、油茶汤。逛吃即可，早点睡。" }
+        ],
+        eat: ["社饭", "炕土豆", "油茶汤", "蒜苗腊肉"],
+        local: ["硒都", "土家族", "恩施玉露"],
+        km: "310 km",
+        traffic: {
+          level: "high", label: "高", peak: "宜昌桥 + 野三河",
+          jams: ["jam-bridge", "jam-yesan"],
+          points: [
+            { spot: "宜昌长江公路大桥", when: "过桥前后常缓行", avoid: "尽量 8:00 前过桥。桥隧群里不要随意变道停车。" },
+            { spot: "G50 长阳 / 高家堰", when: "进山后叠旅游车", avoid: "沪渝高速长阳、恩施段是湖北国庆点名的高风险段。" },
+            { spot: "野三河 / 恩施段", when: "进出川渝走廊节假日超级堵", avoid: "平原把油加满。服务区排队时停主线外，防止倒灌。" }
+          ]
+        },
+        note: "桥隧多。宁肯早到恩施，也不要卡在野三河天黑。"
+      }));
+
+      list.push(stamp(2, {
+        city: "奉节", how: "巫恩公路", stay: "奉节",
+        title: "大峡谷半日，再开进奉节",
+        segs: ["seg-ef"], cities: ["enshi", "fengjie"],
+        blocks: [
+          { time: "07:00", kind: "eat", tag: "吃", title: "酒店简单早饭", text: "7:30 必须到大峡谷游客中心。智游恩施 / 游湖北已预约。" },
+          { time: "07:30", kind: "city", tag: "山", title: "恩施大峡谷 · 七星寨", text: "索道上行，看一炷香、绝壁长廊。只走精华，不贪云龙地缝。" },
+          { time: "12:00", kind: "eat", tag: "吃", title: "景区简餐", text: "吃完立刻往出口。11 点后出山更堵。" },
+          { time: "14:00", kind: "land", tag: "车", title: "G242 巫恩公路", text: "约 120 公里 / 3 小时。窄、弯、临崖，不摸黑。" },
+          { time: "16:30", kind: "city", tag: "停", title: "沐抚古村 20 分钟", text: "拍照歇脚。别拖成一小时。" },
+          { time: "18:00", kind: "stay", tag: "住", title: w ? "车停小红船码头" : "入住奉节江边", text: w ? "马路对面停车场约 15 元/天。明天人去坐船，车留在这儿。不要住高铁站。" : "车跟着走。住江边县城，方便明早白帝城。" },
+          { time: "19:00", kind: "eat", tag: "吃", title: "晚饭夔面", text: "清淡川菜即可。盬子鸡可留到明天中午。" }
+        ],
+        eat: ["夔面", "清淡川菜"],
+        local: ["最美公路", "库区新城"],
+        km: "景区 + 120 km",
+        traffic: {
+          level: "high", label: "高", peak: "S233 07:30–11:00 进景区",
+          jams: ["jam-s233"],
+          points: [
+            { spot: "S233 屯渝线进大峡谷", when: "7:30–11:00 进、15:00–18:30 出", avoid: "7:30 到游客中心。十一期间这段平均时速曾只有约 18 公里。" },
+            { spot: "G242 巫恩公路", when: "不是高速堵，是窄、弯、临崖慢", avoid: "14:00 必须离开景区。不摸黑走盘山。拥堵可绕 G318 罗针田–利川团堡再折返。" }
+          ]
+        },
+        note: "智游恩施 / 游湖北提前预约。盬子鸡可放到明天中午。"
+      }));
+
+      if (w) {
+        list.push(stamp(3, {
+          city: "巫山", how: "小红船", stay: "巫山",
+          title: "白帝城看夔门，坐船过瞿塘峡",
+          segs: ["seg-fw"], cities: ["fengjie", "wushan"],
+          blocks: [
+            { time: "08:00", kind: "city", tag: "景", title: "白帝城–瞿塘峡", text: "托孤堂、观夔门。水位抬升后城在山上。必须留足赶回 13:20 船的时间。" },
+            { time: "11:30", kind: "eat", tag: "吃", title: "下山简餐", text: "县城或码头附近快速解决。不要在白帝城耗到开船。" },
+            { time: "13:00", kind: "boat", tag: "船", title: "小红船码头候船", text: "地图搜「小红船码头」。车停对面停车场。提前 20 分钟到。" },
+            { time: "13:20", kind: "boat", tag: "船", title: "奉节 → 巫山 小红船", text: "约 3.5 小时，票约 40 元船上扫码。过瞿塘峡，赖导上集同一班水上公交。" },
+            { time: "17:00", kind: "city", tag: "城", title: "巫山 8D 山城", text: "神女大扶梯约 3 元，再走梯坎巷子。酒店订古城码头步行圈。" },
+            { time: "18:30", kind: "eat", tag: "吃", title: "晚饭巫山烤鱼", text: "蒜香或泡椒。包子铺是早点，今晚不排三友。" },
+            { time: "20:00", kind: "stay", tag: "住", title: "入住码头步行圈", text: "明早去三友包子。若坐巫峡船，订能走到左边入口的。" }
+          ],
+          eat: ["巫山烤鱼", "蒜香 / 泡椒", "三友包子（明早）"],
+          local: ["移民新城", "赖导上集", "三友包子"],
+          km: "白帝城往返",
+          traffic: {
+            level: "mid", label: "中", peak: "白帝城停车场上午",
+            jams: ["jam-s233"],
+            points: [
+              { spot: "白帝城进山路 / 停车场", when: "9:00–11:00", avoid: "早点进。满员就停县城打车，必须留足赶回 13:20 船的时间。" },
+              { spot: "小红船码头", when: "开船前 30 分钟", avoid: "车停对面停车场。船准点，堵在白帝城回不来。" }
+            ]
+          },
+          note: "车仍在奉节。这是加回巫山之后才有的一天。"
+        }));
+      } else if (b) {
+        list.push(stamp(3, {
+          city: "宜昌", how: "经巴东", stay: "宜昌",
+          title: "白帝城过后，陆路经巴东进宜昌",
+          segs: ["seg-fb", "seg-by"], cities: ["fengjie", "badong", "yichang"],
+          blocks: [
+            { time: "07:30", kind: "city", tag: "景", title: "白帝城–夔门", text: "早点进、早点出。中午前必须离开奉节。" },
+            { time: "11:00", kind: "eat", tag: "吃", title: "盬子鸡或夔面", text: "奉节午饭后直奔巴东。别再逛夔州城。" },
+            { time: "12:30", kind: "city", tag: "吃", title: "巴东茶店牛肉", text: "巫峡口看看江，吃饭控制在 1 小时。" },
+            { time: "14:30", kind: "land", tag: "车", title: "巴东 → 宜昌", text: "约 175 公里 / 3.5 小时。" },
+            { time: "18:30", kind: "stay", tag: "住", title: "入住三峡游客中心附近", text: "少穿城。明天若排两坝一峡，住集合点步行圈。" },
+            { time: "19:30", kind: "eat", tag: "吃", title: "宜昌萝卜饺子", text: "顶包面也可以。早点歇。" }
+          ],
+          eat: ["盬子鸡或夔面", "茶店牛肉", "宜昌萝卜饺子"],
+          local: ["白帝托孤", "峡江路过"],
+          km: "白帝城 + 175 km",
+          traffic: {
+            level: "mid", label: "中", peak: "G50 巴东段 + G42",
+            jams: ["jam-s233", "jam-g42"],
+            points: [
+              { spot: "白帝城停车场", when: "9:00 前", avoid: "缩短停留，把时间留给巴东到宜昌。" },
+              { spot: "G50 巴东段 / G42", when: "下午", avoid: "14:30 前离开巴东。" }
+            ]
+          },
+          note: "六天版把奉节和巴东压在同一天。若想坐船过巫峡，需要先加入巫山。"
+        }));
+      } else {
+        list.push(stamp(3, {
+          city: "宜昌", how: "白帝城后出发", stay: "宜昌",
+          title: "上午夔门，下午开到宜昌",
+          segs: ["seg-fy"], cities: ["fengjie", "yichang"],
+          blocks: [
+            { time: "07:30", kind: "eat", tag: "吃", title: "退房后出发", text: "酒店简单早饭。8:00 进白帝城。" },
+            { time: "08:00", kind: "city", tag: "景", title: "白帝城–瞿塘峡", text: "托孤堂、观夔门。11:30 前下山，不再逛夔州城。" },
+            { time: "11:30", kind: "eat", tag: "吃", title: "盬子鸡或夔面", text: "奉节午饭。吃完立刻上高速。" },
+            { time: "12:30", kind: "land", tag: "车", title: "奉节 → 宜昌", text: "约 4.5–5.5 小时。中午前上 G42 比下午稳。" },
+            { time: "18:00", kind: "stay", tag: "住", title: "入住三峡游客中心附近", text: "少穿江峡大道。明天两坝一峡在这儿集合。" },
+            { time: "19:00", kind: "eat", tag: "吃", title: "顶包面", text: "红油鲜肉包或萝卜饺子。早点睡，明早 8 点集合。" }
+          ],
+          eat: ["盬子鸡或夔面", "宜昌顶包面"],
+          local: ["朝辞白帝", "给明天留大坝"],
+          km: "白帝城 + 4.5h",
+          traffic: {
+            level: "mid", label: "中", peak: "午后 G42",
+            jams: ["jam-s233", "jam-g42"],
+            points: [
+              { spot: "白帝城进山路", when: "8:00–10:00", avoid: "早点进，满员就打车上山。" },
+              { spot: "G42 沪蓉 当阳 / 宜巴段", when: "午后旅游车", avoid: "中午前上高速，比下午走稳。" }
+            ]
+          },
+          note: "六天版把白帝城和赴宜昌并到一天，10/6 返程。"
+        }));
+      }
+
+      if (w && b) {
+        list.push(stamp(4, {
+          city: "宜昌", how: "船 + 取车", stay: "宜昌",
+          title: "过巫峡到巴东，取车夜赴宜昌",
+          segs: ["seg-wb", "seg-by"], cities: ["wushan", "badong", "yichang"],
+          blocks: [
+            { time: "06:30", kind: "eat", tag: "吃", title: "三友包子", text: "赖导上集里的巫山早餐铺。麻辣馅，本地早点排队。开船前吃完，地图搜「三友包子」。" },
+            { time: "08:00", kind: "boat", tag: "船", title: "巫山 → 巴东", text: "走左边入口（巫山–神女峰–培石）。鳊鱼溪换小白船，约 5 小时，40+50 元。" },
+            { time: "13:30", kind: "eat", tag: "吃", title: "巴东茶店牛肉", text: "打包或快吃。给高铁接驳留时间。" },
+            { time: "14:30", kind: "rail", tag: "铁", title: "高铁回奉节取车", text: "巫峡码头打车去郑渝高铁巴东站（约 50–70 分钟），高铁约 30 分钟回奉节。" },
+            { time: "16:30", kind: "land", tag: "车", title: "奉节夜驶宜昌", text: "G42 约 4.5–5.5 小时，预计 21:00 到。两人轮开。" },
+            { time: "21:00", kind: "stay", tag: "住", title: "入住游客中心附近", text: "明天只能返程，排不下完整两坝一峡。" }
+          ],
+          eat: ["茶店牛肉", "宜昌夜宵：萝卜饺子"],
+          local: ["巫峡最长", "赖导下集"],
+          km: "船 + 夜驶 4.5h+",
+          traffic: {
+            level: "mid", label: "中", peak: "不是堵，是夜驶山路",
+            jams: ["jam-g42"],
+            points: [
+              { spot: "巴东站盘山接驳", when: "下午 13:00 后", avoid: "巫峡码头到郑渝巴东站预留 50–70 分钟，别按平原距离估。" },
+              { spot: "G42 宜巴夜驶", when: "16:00 后桥隧", avoid: "两人轮开。这天风险是疲劳，不是收费站排队。" }
+            ]
+          },
+          note: "六天里最硬的一天。明天只能返程，排不下完整两坝一峡。"
+        }));
+      } else if (w) {
+        list.push(stamp(4, {
+          city: "宜昌", how: "取车去宜昌", stay: "宜昌",
+          title: "巫山收尾，取车开往宜昌",
+          segs: ["seg-wy", "seg-fy"], cities: ["wushan", "fengjie", "yichang"],
+          blocks: [
+            { time: "07:30", kind: "eat", tag: "吃", title: "三友包子", text: "赖导上集里的巫山早餐铺。麻辣馅，本地人排队。早点去，下午常提前收摊炒料。地图搜「三友包子」。" },
+            { time: "09:00", kind: "city", tag: "城", title: "江边再走一轮", text: "神女大扶梯、梯坎。不过巫峡船，把上午留给县城。" },
+            { time: "11:00", kind: "rail", tag: "铁", title: "高铁回奉节取车", text: "巫山站到奉节约 20–30 分钟。取车后马上上 G42。" },
+            { time: "12:00", kind: "land", tag: "车", title: "奉节 → 宜昌", text: "约 4.5–5.5 小时，尽量 15:00 前上高速。" },
+            { time: "18:00", kind: "stay", tag: "住", title: "入住游客中心附近", text: "导航避开江峡大道、平湖大道。" },
+            { time: "19:00", kind: "eat", tag: "吃", title: "顶包面", text: "明天返汉。完整两坝一峡今天排不下。" }
+          ],
+          eat: ["三友包子", "宜昌顶包面"],
+          local: ["瞿塘峡已看", "巫峡未走"],
+          km: "高铁 + 4.5h",
+          traffic: {
+            level: "mid", label: "中", peak: "午后 G42 旅游车",
+            jams: ["jam-g42"],
+            points: [
+              { spot: "G42 沪蓉 当阳 / 宜巴段", when: "午后旅游车汇入", avoid: "取车后马上走，尽量 15:00 前上高速。" },
+              { spot: "宜昌江峡大道、平湖大道", when: "傍晚进城", avoid: "导航避开江边主路，直奔住宿。" }
+            ]
+          },
+          note: "加了巫山后，明天就要返汉，完整两坝一峡排不下。"
+        }));
+      } else {
+        list.push(stamp(4, {
+          city: "宜昌", how: "两坝一峡", stay: "宜昌",
+          title: "用一天补齐西陵峡",
+          segs: ["seg-by"], cities: ["yichang"],
+          blocks: [
+            { time: "07:30", kind: "eat", tag: "吃", title: "酒店早饭后集合", text: "带身份证。三峡游客中心 8:00 前后集合。" },
+            { time: "08:00", kind: "boat", tag: "船", title: "两坝一峡", text: "过葛洲坝船闸，看西陵峡，登三峡大坝。套票约 258 元，提前 10–15 天订。" },
+            { time: "12:00", kind: "eat", tag: "吃", title: "船上或坝区简餐", text: "别指望景区大餐。把体力留给下午上坝。" },
+            { time: "15:00", kind: "city", tag: "坝", title: "坛子岭 / 185 平台", text: "截流纪念园看完再回市区。" },
+            { time: "18:00", kind: "city", tag: "江", title: "滨江收工", text: "回游客中心附近，少穿城。" },
+            { time: "19:00", kind: "eat", tag: "吃", title: "萝卜饺子、凉虾", text: "明天中午前返汉。今晚早睡。" }
+          ],
+          eat: ["顶包面", "萝卜饺子", "凉虾", "红油鲜肉包"],
+          local: ["葛洲坝", "三峡大坝", "西陵峡"],
+          km: "市区接驳",
+          traffic: {
+            level: "high", label: "高", peak: "冯家湾 08:40–11:30",
+            jams: ["jam-dam"],
+            points: [
+              { spot: "冯家湾检查站", when: "8:40–11:30 历年滞留", avoid: "优先张太高速 / 翻坝高速进坝。网上预约办证。" },
+              { spot: "三峡专用公路", when: "上午进坝车流", avoid: "按高速标准开，勿随意停车。" },
+              { spot: "江峡大道 / 平湖大道", when: "市区接驳", avoid: "住游客中心附近，少穿城。" }
+            ]
+          },
+          note: "提前 10–15 天订套票，约 258 元/人。明天中午前返汉。"
+        }));
+      }
+
+      list.push(stamp(5, {
+        city: "武汉", how: "返程", stay: "武汉",
+        title: w ? "宜昌留白后返汉" : "错峰返汉，中午前上高速",
+        segs: ["seg-yw"], cities: ["yichang", "wuhan"],
+        blocks: w ? [
+          { time: "08:00", kind: "eat", tag: "吃", title: "宜昌早饭", text: "顶包面或酒店。加了巫山，今天排不下两坝一峡。" },
+          { time: "09:00", kind: "city", tag: "闲", title: "滨江或博物馆", text: "只留一小时。16–18 点到汉最堵。" },
+          { time: "11:00", kind: "land", tag: "车", title: "宜昌 → 武汉", text: "约 320 公里，按 5–6 小时预留。午前上高速。" },
+          { time: "13:00", kind: "eat", tag: "吃", title: "服务区简餐", text: "潜江、仙桃段是返程高峰，尽量别在这儿久停。" },
+          { time: "17:00", kind: "city", tag: "到", title: "到汉", text: "绕城、汉蔡进城仍可能缓。热干面收尾。" }
+        ] : [
+          { time: "08:00", kind: "eat", tag: "吃", title: "宜昌早饭", text: "大坝昨天已走完。吃完退房。" },
+          { time: "09:00", kind: "city", tag: "闲", title: "滨江留白", text: "博物馆或江边走走。11:30 必须上高速。" },
+          { time: "11:30", kind: "land", tag: "车", title: "宜昌 → 武汉", text: "约 320 公里。今天走仍免过路费，躲开 7 日高峰。" },
+          { time: "13:30", kind: "eat", tag: "吃", title: "服务区简餐", text: "G50 荆州–潜江–仙桃往武汉方向，16 点后更堵。" },
+          { time: "17:30", kind: "city", tag: "到", title: "到汉 · 热干面", text: "行程结束。免费政策看到 10/7 24 点。" }
+        ],
+        eat: ["宜昌吃完再走", "热干面收尾"],
+        local: ["10/6 结束", "过路费仍免"],
+        km: "约 320 km",
+        traffic: {
+          level: "high", label: "高", peak: "10/6 16:00–18:00 到汉",
+          jams: ["jam-back", "jam-exit"],
+          points: [
+            { spot: "G50 荆州–潜江–仙桃 往武汉", when: "6 日 16:00–18:00 到汉高峰", avoid: "11:30 前上高速。提前一天返，就是为了躲开 7 日车流。" },
+            { spot: "汉蔡 / 蔡甸 / 绕城进城", when: "傍晚到汉", avoid: "免费政策看到 7 日 24 点，今天走仍然免过路费。" }
+          ]
+        },
+        note: "行程 10/6 结束。6 日下午仍是返程高峰，宁可早走。"
+      }));
+
+      return list;
+    }
+
+    function trainDays() {
+      const w = state.wushan;
+      const b = state.badong;
+      const list = [];
+
+      list.push(stamp(0, {
+        city: "荆州", how: "D5817", stay: "荆州",
+        title: "动车下荆州，把古城走完",
+        segs: ["seg-wj"], cities: ["wuhan", "jingzhou"],
+        blocks: [
+          { time: "07:10", kind: "rail", tag: "铁", title: "D5817 汉口 → 荆州", text: "汉口 07:10 开，荆州 08:37 到，约 1.5 小时。汉宜铁路，多数车次始发汉口不是武汉站。备选 D629 07:20–08:40。" },
+          { time: "09:00", kind: "eat", tag: "吃", title: "早堂面、鱼糕", text: "出站先吃。古城没有泊车损耗，下午能走完。" },
+          { time: "11:00", kind: "city", tag: "城", title: "东门上古城墙", text: "宾阳楼、金凤门。比自驾能走得更完整。" },
+          { time: "15:00", kind: "city", tag: "逛", title: "九鼎街、关帝庙", text: "小胡鸭真空装可带走。" },
+          { time: "17:30", kind: "stay", tag: "住", title: "入住古城", text: "住城里，不要住车站。" },
+          { time: "19:00", kind: "eat", tag: "吃", title: "荆州三宝晚饭", text: "千张扣肉、八宝饭。明天赶 D5997，别睡过头。" }
+        ],
+        eat: ["荆州三宝", "早堂面", "小胡鸭真空"],
+        local: ["楚都", "汉宜铁路"],
+        trains: [
+          { no: "D5817", run: "汉口 07:10 → 荆州 08:37", tip: "汉宜铁路直达，约 1.5 小时。优先这趟，10 点前进城。" },
+          { no: "D629 备选", run: "汉口 07:20 → 荆州 08:40", tip: "经天门南。D5817 没票再买这趟。" }
+        ],
+        note: "车次以 12306 为准。不要去武汉站，去汉口站。"
+      }));
+
+      list.push(stamp(1, {
+        city: "恩施", how: "D5997", stay: "恩施",
+        title: "荆州直达恩施，傍晚进土家城",
+        segs: ["seg-je"], cities: ["jingzhou", "enshi"],
+        blocks: [
+          { time: "06:50", kind: "eat", tag: "吃", title: "退房去荆州站", text: "D5997 07:21 开。不要在宜昌东下错车。" },
+          { time: "07:21", kind: "rail", tag: "铁", title: "D5997 荆州 → 恩施", text: "荆州 07:21 开，经宜昌东、野三关，恩施 09:53 到，约 2.5 小时。备选 D633 08:07–10:50。" },
+          { time: "10:30", kind: "eat", tag: "吃", title: "到恩施先吃饭", text: "合渣、炕土豆。下午去土司城。" },
+          { time: "14:00", kind: "city", tag: "城", title: "土司城", text: "吊脚楼看完即止。" },
+          { time: "17:30", kind: "stay", tag: "住", title: "入住市区", text: "连住两晚。当晚确认次日大峡谷包车。" },
+          { time: "19:30", kind: "eat", tag: "吃", title: "女儿城逛吃", text: "社饭、油茶汤。只逛吃，早点睡。" }
+        ],
+        eat: ["社饭", "炕土豆", "合渣"],
+        local: ["硒都", "玉露茶"],
+        trains: [
+          { no: "D5997", run: "荆州 07:21 → 恩施 09:53", tip: "经宜昌东、野三关。宜昌东只停几分钟，别下车。" },
+          { no: "D633 备选", run: "荆州 08:07 → 恩施 10:50", tip: "经野三关、高坪、建始。D5997 没票再买。" }
+        ],
+        note: "当晚确认次日大峡谷包车。恩施到奉节没有直达高铁。"
+      }));
+
+      list.push(stamp(2, {
+        city: "恩施", how: "峡谷全日", stay: "恩施",
+        title: "大峡谷整日，把山走透",
+        segs: [], cities: ["enshi"],
+        blocks: [
+          { time: "07:30", kind: "eat", tag: "吃", title: "酒店早饭", text: "包车或景交 8:00 出发。" },
+          { time: "08:00", kind: "city", tag: "山", title: "七星寨", text: "索道上行，一炷香、绝壁长廊。套票含景交。" },
+          { time: "12:00", kind: "eat", tag: "吃", title: "景区午饭", text: "土家蒸肉或简餐。" },
+          { time: "13:30", kind: "city", tag: "山", title: "云龙地缝", text: "火车版比自驾多这一段。体力一般加垂梯。" },
+          { time: "17:00", kind: "city", tag: "回", title: "回市区", text: "门票约提前 15 天。当晚轻装，明天走公路。" },
+          { time: "18:30", kind: "stay", tag: "住", title: "仍住恩施", text: "连住第二晚，不用换酒店。" },
+          { time: "19:00", kind: "eat", tag: "吃", title: "腊肉合渣", text: "明天早班去奉节，别喝太晚。" }
+        ],
+        eat: ["土家蒸肉", "腊肉合渣"],
+        local: ["喀斯特峰丛", "一炷香"],
+        note: "门票约提前 15 天开售。当晚轻装。",
+        trainHint: "当天不出站。明天公路去奉节，不要买恩施经万州中转的票。"
+      }));
+
+      list.push(stamp(3, {
+        city: "奉节", how: "公路 3h", stay: "奉节",
+        title: "不绕万州，走巫恩公路进峡",
+        segs: ["seg-ef"], cities: ["enshi", "fengjie"],
+        blocks: [
+          { time: "07:30", kind: "land", tag: "车", title: "班车或包车去奉节", text: "约 3 小时。不要赌万州站转万州北。" },
+          { time: "11:00", kind: "eat", tag: "吃", title: "路上或到站简餐", text: "把下午留给白帝城。" },
+          { time: "13:30", kind: "city", tag: "景", title: "白帝城–夔门", text: w ? "看完入住小红船码头附近，为明早 8:00 船做准备。" : "下午看夔门。明天去宜昌。" },
+          { time: "17:00", kind: "stay", tag: "住", title: "入住江边", text: "不要住奉节高铁站。" },
+          { time: "18:30", kind: "eat", tag: "吃", title: "盬子鸡、脐橙", text: w ? "明早码头登船，晚饭清淡。" : "明天上午若还要补白帝城，早点睡。" }
+        ],
+        eat: ["盬子鸡", "奉节脐橙"],
+        local: ["巫恩公路", "白帝托孤"],
+        note: "住江边，不要住奉节高铁站。",
+        trainHint: "恩施到奉节无直达高铁。班车或包车走巫恩公路约 3 小时，别赌万州站转万州北。"
+      }));
+
+      if (w) {
+        list.push(stamp(4, {
+          city: "巫山", how: "小红船", stay: "巫山",
+          title: "早上登船，把巫山留给下午",
+          segs: ["seg-fw"], cities: ["fengjie", "wushan"],
+          blocks: [
+            { time: "08:00", kind: "boat", tag: "船", title: "奉节 → 巫山", text: "约 3.5 小时 / 约 40 元。船票不用预订。赖导上集同一班水上公交。" },
+            { time: "12:00", kind: "eat", tag: "吃", title: "船上或到岸简餐", text: "把正餐留给晚上烤鱼。包子铺明早再去。" },
+            { time: "13:00", kind: "city", tag: "城", title: "神女大扶梯、梯坎", text: "移民后的江边县城。酒店订码头步行圈。" },
+            { time: "18:00", kind: "eat", tag: "吃", title: "巫山烤鱼", text: "蒜香或泡椒。三友包子是早点，今晚不去。" },
+            { time: "20:00", kind: "stay", tag: "住", title: "入住码头圈", text: b ? "明天 6:30 先吃包子，8:00 左边入口坐巫峡船。" : "明早三友包子，再转宜昌返汉。" }
+          ],
+          eat: ["巫山烤鱼", "三友包子（明早）"],
+          local: ["赖导上集", "水上公交", "三友包子"],
+          note: b ? "明天 8:00 还在同一码头坐去巴东的船，走左边入口。" : "不加巴东就不过巫峡。明天转宜昌后直接返汉，排不下两坝一峡。",
+          trainHint: "今天坐小红船，不坐火车。郑渝高铁奉节→巫山约 20 分钟，只作误船备选，12306 搜「奉节 巫山」。"
+        }));
+      } else if (b) {
+        list.push(stamp(4, {
+          city: "巴东", how: "公路", stay: "巴东",
+          title: "陆路进巴东，不过小红船",
+          segs: ["seg-fb"], cities: ["fengjie", "badong"],
+          blocks: [
+            { time: "08:30", kind: "land", tag: "巴", title: "奉节 → 巴东", text: "班车或包车。没有巫山过夜，赶不上巫峡 8:00 换船。" },
+            { time: "12:00", kind: "eat", tag: "吃", title: "茶店牛肉", text: "巫峡口看看江。这是巴东必吃。" },
+            { time: "14:00", kind: "city", tag: "城", title: "巴东县城", text: "江边走走。住江边，方便明天大巴去宜昌。" },
+            { time: "17:30", kind: "stay", tag: "住", title: "入住江边", text: "若想坐船过巫峡，需要先加入巫山。" },
+            { time: "19:00", kind: "eat", tag: "吃", title: "晚饭仍可牛肉或川菜", text: "明天巴东转宜昌后返汉。" }
+          ],
+          eat: ["茶店牛肉"],
+          local: ["峡江第一城"],
+          note: "若想坐船过巫峡，需要先加入巫山。明天巴东转宜昌后返汉。",
+          trainHint: "奉节到巴东坐班车即可。郑渝高铁奉节→巴东约 40 分钟，但巴东站在山上，到江边县城还要 50–70 分钟。"
+        }));
+      } else {
+        list.push(stamp(4, {
+          city: "宜昌", how: "去宜昌", stay: "宜昌",
+          title: "奉节收尾，下午进宜昌",
+          segs: ["seg-fy"], cities: ["fengjie", "yichang"],
+          blocks: [
+            { time: "08:00", kind: "eat", tag: "吃", title: "退房早饭", text: "昨天若没走够白帝城，上午补完。" },
+            { time: "09:00", kind: "city", tag: "景", title: "白帝城收尾", text: "中午前必须出发。" },
+            { time: "12:00", kind: "land", tag: "巴", title: "奉节 → 宜昌", text: "包车或长途约 4–5 小时。郑渝高铁不去宜昌东，别绕。" },
+            { time: "17:30", kind: "stay", tag: "住", title: "入住游客中心附近", text: "明天两坝一峡，傍晚动车返汉。" },
+            { time: "19:00", kind: "eat", tag: "吃", title: "顶包面", text: "不要买明天 18:30 以前的火车票。" }
+          ],
+          eat: ["奉节午餐", "宜昌顶包面"],
+          local: ["给明天留大坝"],
+          note: "六天版：明天两坝一峡，傍晚动车返汉。",
+          trainHint: "奉节到宜昌东没有直达高铁。郑渝线不去宜昌东，包车或长途约 4–5 小时。"
+        }));
+      }
+
+      if (w && b) {
+        list.push(stamp(5, {
+          city: "武汉", how: "D2252", stay: "武汉",
+          title: "过巫峡到宜昌，当晚动车回家",
+          segs: ["seg-wb", "seg-by", "seg-yw"], cities: ["wushan", "badong", "yichang", "wuhan"],
+          blocks: [
+            { time: "06:30", kind: "eat", tag: "吃", title: "三友包子", text: "赖导上集里的巫山早餐铺。开船前吃完。地图搜「三友包子」。" },
+            { time: "08:00", kind: "boat", tag: "船", title: "巫山 → 巴东", text: "左边入口。约 5 小时，培石换小白船。" },
+            { time: "13:30", kind: "eat", tag: "吃", title: "茶店牛肉", text: "打包或快吃。郑渝高铁巴东站不去宜昌东。" },
+            { time: "14:30", kind: "land", tag: "巴", title: "巴东大巴 → 宜昌", text: "预留接驳。提前查末班。赶 19:54 的 D2252。" },
+            { time: "19:54", kind: "rail", tag: "铁", title: "D2252 宜昌东 → 汉口", text: "宜昌东 19:54 开，汉口约 21:50 到，约 2 小时。船闸或大巴延误就改 D5924 20:30。" }
+          ],
+          eat: ["茶店牛肉", "车上吃"],
+          local: ["巫峡收尾", "两坝排不下"],
+          trains: [
+            { no: "D2252", run: "宜昌东 19:54 → 汉口 21:50", tip: "给大巴接驳留余量。不要买 18:30 以前的票。" },
+            { no: "D5924 备选", run: "宜昌东 20:30 → 汉口 22:21", tip: "D2252 赶不上再买这趟。" }
+          ],
+          note: "六天加两站，这一天会很满。提前查巴东末班和大巴接驳。"
+        }));
+      } else if (w) {
+        list.push(stamp(5, {
+          city: "武汉", how: "D2260", stay: "武汉",
+          title: "巫山转宜昌，下午动车返汉",
+          segs: ["seg-wy", "seg-yw"], cities: ["wushan", "yichang", "wuhan"],
+          blocks: [
+            { time: "07:30", kind: "eat", tag: "吃", title: "三友包子", text: "赖导上集里的巫山早餐铺。麻辣馅，早点排队。地图搜「三友包子」。" },
+            { time: "09:30", kind: "city", tag: "城", title: "江边再走", text: "10:30 前离开县城。" },
+            { time: "11:00", kind: "land", tag: "巴", title: "巫山 → 宜昌", text: "大巴或包车更直。郑渝高铁巫山站不去宜昌东。" },
+            { time: "16:53", kind: "rail", tag: "铁", title: "D2260 宜昌东 → 汉口", text: "宜昌东 16:53 开，汉口约 19:01 到。若 16:09 能赶到，可改 D5820。" }
+          ],
+          eat: ["三友包子", "热干面收尾"],
+          local: ["瞿塘已看", "两坝排不下"],
+          trains: [
+            { no: "D2260", run: "宜昌东 16:53 → 汉口 19:01", tip: "巫山过来用大巴，预留进城时间。" },
+            { no: "D5820 备选", run: "宜昌东 16:09 → 汉口 18:07", tip: "到得早买这趟。始发宜昌东，相对稳。" }
+          ],
+          note: "加了巫山就排不下两坝一峡。再点巴东会变成巫峡换船后当晚返。"
+        }));
+      } else if (b) {
+        list.push(stamp(5, {
+          city: "武汉", how: "D5820", stay: "武汉",
+          title: "巴东到宜昌，下午动车回家",
+          segs: ["seg-by", "seg-yw"], cities: ["badong", "yichang", "wuhan"],
+          blocks: [
+            { time: "09:00", kind: "land", tag: "巴", title: "巴东 → 宜昌", text: "大巴约 3 小时。中午到宜昌东附近，赶 D5820。" },
+            { time: "12:30", kind: "eat", tag: "吃", title: "顶包面", text: "两坝一峡今天排不下。" },
+            { time: "16:09", kind: "rail", tag: "铁", title: "D5820 宜昌东 → 汉口", text: "宜昌东 16:09 开，汉口 18:07 到。赶不上改 D2260 16:53。" }
+          ],
+          eat: ["顶包面", "热干面收尾"],
+          local: ["10/6 结束"],
+          trains: [
+            { no: "D5820", run: "宜昌东 16:09 → 汉口 18:07", tip: "宜昌东始发。大巴晚到就改后面一趟。" },
+            { no: "D2260 备选", run: "宜昌东 16:53 → 汉口 19:01", tip: "D5820 没赶上买这趟。" }
+          ],
+          note: "若想坐船过巫峡，需要先加入巫山。"
+        }));
+      } else {
+        list.push(stamp(5, {
+          city: "武汉", how: "D2252", stay: "武汉",
+          title: "白天游峡，傍晚动车回家",
+          segs: ["seg-by", "seg-yw"], cities: ["yichang", "wuhan"],
+          blocks: [
+            { time: "07:30", kind: "eat", tag: "吃", title: "酒店早饭后集合", text: "建议车去船回，方便结束后转宜昌东。" },
+            { time: "08:00", kind: "boat", tag: "船", title: "两坝一峡", text: "过葛洲坝、西陵峡、三峡大坝。提前 10–15 天订。" },
+            { time: "12:00", kind: "eat", tag: "吃", title: "船上简餐", text: "船闸延误时有发生，火车票必须留余量。" },
+            { time: "16:00", kind: "city", tag: "坝", title: "下坝转宜昌东", text: "不要买 18:30 以前的票。" },
+            { time: "19:54", kind: "rail", tag: "铁", title: "D2252 宜昌东 → 汉口", text: "宜昌东 19:54 开，汉口约 21:50 到。船闸晚了改 D5924 20:30。" }
+          ],
+          eat: ["船上简餐", "回到武汉再吃"],
+          local: ["葛洲坝", "西陵峡", "10/6 结束"],
+          trains: [
+            { no: "D2252", run: "宜昌东 19:54 → 汉口 21:50", tip: "给两坝一峡船闸留余量。不要买 18:30 以前的票。" },
+            { no: "D5924 备选", run: "宜昌东 20:30 → 汉口 22:21", tip: "船闸延误时改签这趟更稳。" }
+          ],
+          note: "提前 10–15 天订两坝一峡。车次以 12306 为准。"
+        }));
+      }
+
+      return list;
+    }
+
+    function days() {
+      return state.mode === "drive" ? driveDays() : trainDays();
+    }
+
+    function routeText() {
+      const names = ["武汉", "荆州", "恩施", "奉节"];
+      if (state.wushan) names.push("巫山");
+      if (state.badong) names.push("巴东");
+      names.push("宜昌", "武汉");
+      return names.join(" → ");
+    }
+
+    function jumpToCity(id) {
+      const list = days();
+      const idx = list.findIndex(function (d) { return d.cities.indexOf(id) !== -1; });
+      if (idx >= 0) state.day = idx;
+    }
+
+    function toggleExtra(key) {
+      state[key] = !state[key];
+      const list = days();
+      if (state.day >= list.length) state.day = list.length - 1;
+      if (state[key]) jumpToCity(key);
+      render();
+    }
+
+    function renderWeek() {
+      const root = document.getElementById("week");
+      root.innerHTML = "";
+      days().forEach(function (d, i) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = i === state.day ? "on" : "";
+        const pip = d.traffic ? '<div class="d-pip ' + d.traffic.level + '"></div>' : '<div class="d-pip"></div>';
+        btn.innerHTML = pip + '<div class="d-body"><div class="d-num">' + d.date + " " + d.week + '</div>' +
+          '<div class="d-city">' + d.city + '</div>' +
+          '<div class="d-how">' + d.how + '</div></div>';
+        btn.addEventListener("click", function () {
+          state.day = i;
+          render();
+        });
+        root.appendChild(btn);
+      });
+    }
+
+    function fillChips(id, items) {
+      const root = document.getElementById(id);
+      root.innerHTML = "";
+      items.forEach(function (x) {
+        const s = document.createElement("span");
+        s.textContent = x;
+        root.appendChild(s);
+      });
+    }
+
+    function renderTrains(d) {
+      const root = document.getElementById("trains");
+      root.innerHTML = "";
+      const rows = d.trains && d.trains.length ? d.trains : [{
+        no: "当日无火车",
+        run: d.trainHint || "今天走公路或船",
+        tip: "恩施到奉节、奉节到宜昌没有好用的直达高铁。郑渝高铁巫山 / 巴东 / 奉节站不去宜昌东。"
+      }];
+      rows.forEach(function (t) {
+        const item = document.createElement("div");
+        item.className = "train-item";
+        const no = document.createElement("div");
+        no.className = "no";
+        no.textContent = t.no;
+        const run = document.createElement("div");
+        run.className = "run";
+        run.textContent = t.run;
+        const tip = document.createElement("div");
+        tip.className = "tip";
+        tip.textContent = t.tip;
+        item.appendChild(no);
+        item.appendChild(run);
+        item.appendChild(tip);
+        root.appendChild(item);
+      });
+    }
+
+    function renderSights(d) {
+      const root = document.getElementById("sights");
+      root.innerHTML = "";
+      const list = SIGHTS[CITY_IDS[d.stay] || "wuhan"] || [];
+      list.forEach(function (s) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "sight-card";
+        const img = document.createElement("img");
+        img.src = s.img;
+        img.alt = s.name;
+        const name = document.createElement("div");
+        name.className = "s-name";
+        name.textContent = s.name;
+        const tag = document.createElement("div");
+        tag.className = "s-tag";
+        tag.textContent = s.tag;
+        const price = document.createElement("div");
+        price.className = "s-price";
+        price.textContent = s.ticket ? "门票 " + s.ticket : "";
+        const dist = document.createElement("div");
+        dist.className = "s-dist";
+        dist.textContent = s.dist ? "距城 " + s.dist : "";
+        btn.appendChild(img);
+        btn.appendChild(name);
+        btn.appendChild(tag);
+        btn.appendChild(price);
+        btn.appendChild(dist);
+        btn.addEventListener("click", function () { openSight(s, d.stay); });
+        root.appendChild(btn);
+      });
+    }
+
+    function openSight(s, city) {
+      const modal = document.getElementById("sight-modal");
+      const img = document.getElementById("sight-img");
+      img.src = s.img;
+      img.alt = s.name;
+      document.getElementById("sight-kicker").textContent = city + " · " + s.tag;
+      document.getElementById("sight-title").textContent = s.name;
+      document.getElementById("sight-price").textContent = s.ticket || "以现场为准";
+      document.getElementById("sight-ticket").textContent = s.ticketNote || "";
+      document.getElementById("sight-dist").textContent = s.dist || "以现场为准";
+      document.getElementById("sight-dist-note").textContent = s.distNote || "";
+      document.getElementById("sight-intro").textContent = s.intro;
+      document.getElementById("sight-tip").textContent = s.tip;
+      modal.classList.add("on");
+    }
+
+    function closeSight() {
+      document.getElementById("sight-modal").classList.remove("on");
+    }
+
+    function renderHotel(d) {
+      const h = HOTELS[CITY_IDS[d.stay] || "wuhan"];
+      document.getElementById("hotel-city").textContent = h.city;
+      const name = document.getElementById("hotel-name");
+      name.textContent = h.name;
+      name.className = "hotel-name" + (h.empty ? " empty" : "");
+      document.getElementById("hotel-area").textContent = h.area;
+      document.getElementById("hotel-why").textContent = h.why;
+      document.getElementById("hotel-tip").textContent = h.tip;
+    }
+
+    function renderDay() {
+      const list = days();
+      if (state.day >= list.length) state.day = 0;
+      const d = list[state.day];
+      document.getElementById("hero-kicker").textContent =
+        d.date + " " + d.week + "  ·  " + (state.mode === "drive" ? "自驾" : "火车");
+      document.getElementById("title").textContent = d.title;
+      document.getElementById("note").textContent = d.note;
+
+      const meta = document.getElementById("hero-meta");
+      meta.innerHTML = "";
+      function addStat(label, value, cls) {
+        const el = document.createElement("div");
+        el.className = "stat";
+        el.innerHTML = label + "<b" + (cls ? ' class="' + cls + '"' : "") + "></b>";
+        el.querySelector("b").textContent = value;
+        meta.appendChild(el);
+      }
+      addStat("过夜", d.stay);
+      if (d.km) addStat("车程", d.km);
+      if (d.traffic) addStat("路况", d.traffic.label, d.traffic.level);
+      else addStat("交通", d.how);
+
+      const flow = document.getElementById("flow");
+      flow.innerHTML = "";
+      d.blocks.forEach(function (b) {
+        const el = document.createElement("div");
+        el.className = "block " + b.kind;
+        el.innerHTML = '<div class="time">' + b.time + '</div><div class="dot"></div>' +
+          '<span class="tag">' + b.tag + '</span><h3>' + b.title + '</h3><p>' + b.text + '</p>';
+        flow.appendChild(el);
+      });
+      fillChips("eat", d.eat);
+      fillChips("local", d.local);
+      renderHotel(d);
+      renderSights(d);
+      renderTrains(d);
+
+      const jams = document.getElementById("jams");
+      jams.innerHTML = "";
+      if (d.traffic) {
+        d.traffic.points.forEach(function (p) {
+          const item = document.createElement("div");
+          item.className = "jam-item " + d.traffic.level;
+          item.innerHTML = '<div class="spot"></div><div class="when"></div><div class="avoid"></div>';
+          item.querySelector(".spot").textContent = p.spot;
+          item.querySelector(".when").textContent = p.when;
+          item.querySelector(".avoid").textContent = p.avoid;
+          jams.appendChild(item);
+        });
+      }
+    }
+
+    function svgEl(name, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", name);
+      Object.keys(attrs).forEach(function (k) { el.setAttribute(k, attrs[k]); });
+      return el;
+    }
+
+    function buildSightMarks() {
+      const svg = document.getElementById("route-map");
+      const shortName = {
+        "武汉长江大桥": "长江大桥",
+        "荆州古城墙": "古城墙",
+        "恩施大峡谷": "大峡谷",
+        "神女大扶梯": "扶梯"
+      };
+      Object.keys(SIGHTS).forEach(function (city) {
+        SIGHTS[city].forEach(function (s, i) {
+          const g = svgEl("g", {
+            class: "sight-mark",
+            "data-city": city,
+            "data-idx": String(i),
+            "data-x": String(s.mx),
+            "data-y": String(s.my),
+            transform: "translate(" + s.mx + "," + s.my + ")"
+          });
+          g.appendChild(svgEl("circle", { class: "sight-hit", r: "12" }));
+          g.appendChild(svgEl("circle", { class: "sight-pin", r: "4" }));
+          const label = svgEl("text", { class: "sight-label", x: "7", y: "4" });
+          label.textContent = shortName[s.name] || s.name;
+          g.appendChild(label);
+          g.appendChild(svgEl("title", {})).textContent = s.name + (s.dist ? " · " + s.dist : "");
+          g.addEventListener("click", function (e) {
+            e.stopPropagation();
+            openSight(s, HOTELS[city].city);
+          });
+          svg.appendChild(g);
+        });
+      });
+    }
+
+    function renderMap() {
+      const d = days()[state.day];
+      document.querySelectorAll(".seg").forEach(function (el) { el.classList.remove("active"); });
+      d.segs.forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.add("active");
+      });
+      document.querySelectorAll(".city-hit").forEach(function (g) {
+        const id = g.getAttribute("data-city");
+        const inTrip = id !== "wushan" && id !== "badong" ? true : state[id];
+        g.classList.toggle("in-trip", inTrip);
+        g.classList.toggle("active", d.cities.indexOf(id) !== -1);
+      });
+      document.querySelectorAll(".jam-mark").forEach(function (g) {
+        const id = g.getAttribute("data-jam");
+        const on = d.traffic && d.traffic.jams && d.traffic.jams.indexOf(id) !== -1;
+        g.classList.toggle("on", Boolean(on));
+      });
+      document.getElementById("app").classList.toggle("mode-drive", state.mode === "drive");
+      document.getElementById("app").classList.toggle("mode-train", state.mode === "train");
+      document.getElementById("tog-wushan").classList.toggle("on", state.wushan);
+      document.getElementById("tog-wushan").innerHTML = state.wushan ? "巫山 已加入<br>再点移出" : "+ 巫山<br>小红船 / 三友包子";
+      document.getElementById("tog-badong").classList.toggle("on", state.badong);
+      document.getElementById("tog-badong").innerHTML = state.badong ? "巴东 已加入<br>再点移出" : "+ 巴东<br>巫峡 / 茶店牛肉";
+      document.getElementById("app").classList.toggle("show-sights", state.showSights);
+      document.getElementById("tog-sights").classList.toggle("on", state.showSights);
+      document.getElementById("tog-sights").textContent = state.showSights ? "隐藏景点" : "显示景点";
+      document.querySelectorAll(".sight-mark").forEach(function (g) {
+        const id = g.getAttribute("data-city");
+        const off = (id === "wushan" && !state.wushan) || (id === "badong" && !state.badong);
+        g.classList.toggle("off-trip", off);
+        g.classList.toggle("today", d.cities.indexOf(id) !== -1);
+      });
+      document.getElementById("sub").textContent = routeText();
+    }
+
+    function render() {
+      renderWeek();
+      renderDay();
+      renderMap();
+    }
+
+    document.getElementById("btn-drive").addEventListener("click", function () {
+      state.mode = "drive";
+      document.getElementById("btn-drive").classList.add("on");
+      document.getElementById("btn-train").classList.remove("on");
+      render();
+    });
+    document.getElementById("btn-train").addEventListener("click", function () {
+      state.mode = "train";
+      document.getElementById("btn-train").classList.add("on");
+      document.getElementById("btn-drive").classList.remove("on");
+      render();
+    });
+    document.getElementById("tog-wushan").addEventListener("click", function () { toggleExtra("wushan"); });
+    document.getElementById("tog-badong").addEventListener("click", function () { toggleExtra("badong"); });
+    document.getElementById("tog-sights").addEventListener("click", function () {
+      state.showSights = !state.showSights;
+      renderMap();
+    });
+    document.querySelectorAll(".jam-mark").forEach(function (g) {
+      g.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (state.mode !== "drive") return;
+        const jamId = g.getAttribute("data-jam");
+        const list = days();
+        const current = list[state.day];
+        if (current.traffic && current.traffic.jams && current.traffic.jams.indexOf(jamId) !== -1) {
+          return;
+        }
+        const idx = list.findIndex(function (d) {
+          return d.traffic && d.traffic.jams && d.traffic.jams.indexOf(jamId) !== -1;
+        });
+        if (idx >= 0) state.day = idx;
+        else jumpToCity(g.getAttribute("data-jump"));
+        render();
+      });
+    });
+    document.querySelectorAll(".city-hit").forEach(function (g) {
+      g.addEventListener("click", function () {
+        const id = g.getAttribute("data-city");
+        if ((id === "wushan" || id === "badong") && !state[id]) {
+          toggleExtra(id);
+          return;
+        }
+        jumpToCity(id);
+        render();
+      });
+    });
+
+    document.getElementById("sight-close").addEventListener("click", closeSight);
+    document.getElementById("sight-modal").addEventListener("click", closeSight);
+    document.querySelector("#sight-modal .modal-card").addEventListener("click", function (e) {
+      e.stopPropagation();
+    });
+
+    function openRefs() {
+      document.getElementById("refs-modal").classList.add("on");
+    }
+    function closeRefs() {
+      document.getElementById("refs-modal").classList.remove("on");
+    }
+    document.getElementById("refs-open").addEventListener("click", openRefs);
+    document.getElementById("refs-close").addEventListener("click", closeRefs);
+    document.getElementById("refs-modal").addEventListener("click", closeRefs);
+    document.querySelector("#refs-modal .modal-card").addEventListener("click", function (e) {
+      e.stopPropagation();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape") return;
+      closeSight();
+      closeRefs();
+    });
+
+    const MAP_W = 640;
+    const MAP_H = 360;
+    const MAP_MAX_K = 8;
+    const mapCam = { k: 1, x: MAP_W / 2, y: MAP_H / 2 };
+    const mapPan = { pointers: new Map(), lastDist: 0, dragging: false, moved: false };
+
+    function svgPoint(clientX, clientY) {
+      const svg = document.getElementById("route-map");
+      const ctm = svg.getScreenCTM();
+      if (!ctm) return { x: mapCam.x, y: mapCam.y };
+      const pt = svg.createSVGPoint();
+      pt.x = clientX;
+      pt.y = clientY;
+      const p = pt.matrixTransform(ctm.inverse());
+      return { x: p.x, y: p.y };
+    }
+
+    function pinXY(g) {
+      if (!g.hasAttribute("data-x")) {
+        const t = g.getAttribute("transform") || "";
+        const m = /translate\(\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)/.exec(t);
+        g.setAttribute("data-x", m ? m[1] : "0");
+        g.setAttribute("data-y", m ? m[2] : "0");
+      }
+      return { x: g.getAttribute("data-x"), y: g.getAttribute("data-y") };
+    }
+
+    function applyPinScale() {
+      const s = 1 / mapCam.k;
+      document.querySelectorAll(".city-hit, .jam-mark, .sight-mark").forEach(function (g) {
+        const p = pinXY(g);
+        g.setAttribute("transform", "translate(" + p.x + "," + p.y + ") scale(" + s + ")");
+      });
+      const dash = (7 / mapCam.k) + " " + (6 / mapCam.k);
+      document.querySelectorAll(".path-boat").forEach(function (el) {
+        el.setAttribute("stroke-dasharray", dash);
+      });
+    }
+
+    function applyMapView() {
+      mapCam.k = Math.min(MAP_MAX_K, Math.max(1, mapCam.k));
+      if (mapCam.k <= 1.0001) {
+        mapCam.k = 1;
+        mapCam.x = MAP_W / 2;
+        mapCam.y = MAP_H / 2;
+      } else {
+        const w = MAP_W / mapCam.k;
+        const h = MAP_H / mapCam.k;
+        const pad = 48 / mapCam.k;
+        mapCam.x = Math.min(MAP_W - w / 2 + pad, Math.max(w / 2 - pad, mapCam.x));
+        mapCam.y = Math.min(MAP_H - h / 2 + pad, Math.max(h / 2 - pad, mapCam.y));
+      }
+      const w = MAP_W / mapCam.k;
+      const h = MAP_H / mapCam.k;
+      document.getElementById("route-map").setAttribute(
+        "viewBox",
+        (mapCam.x - w / 2) + " " + (mapCam.y - h / 2) + " " + w + " " + h
+      );
+      applyPinScale();
+    }
+
+    function zoomAt(svgX, svgY, nextK) {
+      nextK = Math.min(MAP_MAX_K, Math.max(1, nextK));
+      const k0 = mapCam.k;
+      if (nextK === k0) {
+        applyMapView();
+        return;
+      }
+      mapCam.x = svgX - (svgX - mapCam.x) * (k0 / nextK);
+      mapCam.y = svgY - (svgY - mapCam.y) * (k0 / nextK);
+      mapCam.k = nextK;
+      applyMapView();
+    }
+
+    function bindMapZoom() {
+      const wrap = document.getElementById("map-wrap");
+      const pointers = mapPan.pointers;
+
+      function isZoomCtrl(el) {
+        return el && el.closest && el.closest(".map-zoom");
+      }
+
+      document.getElementById("map-zoom-in").addEventListener("click", function () {
+        zoomAt(mapCam.x, mapCam.y, mapCam.k * 1.28);
+      });
+      document.getElementById("map-zoom-out").addEventListener("click", function () {
+        zoomAt(mapCam.x, mapCam.y, mapCam.k / 1.28);
+      });
+      document.getElementById("map-zoom-reset").addEventListener("click", function () {
+        mapCam.k = 1;
+        mapCam.x = MAP_W / 2;
+        mapCam.y = MAP_H / 2;
+        applyMapView();
+      });
+
+      wrap.addEventListener("wheel", function (e) {
+        if (isZoomCtrl(e.target)) return;
+        e.preventDefault();
+        const sp = svgPoint(e.clientX, e.clientY);
+        const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+        zoomAt(sp.x, sp.y, mapCam.k * factor);
+      }, { passive: false });
+
+      wrap.addEventListener("pointerdown", function (e) {
+        if (isZoomCtrl(e.target) || e.button !== 0) return;
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        mapPan.moved = false;
+        if (pointers.size === 1) {
+          mapPan.dragging = true;
+          wrap.classList.add("is-panning");
+        } else if (pointers.size === 2) {
+          mapPan.dragging = false;
+          const pts = Array.from(pointers.values());
+          mapPan.lastDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        }
+      });
+
+      function onPointerMove(e) {
+        if (!pointers.has(e.pointerId)) return;
+        const prev = pointers.get(e.pointerId);
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (pointers.size === 2) {
+          const pts = Array.from(pointers.values());
+          const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+          const mid = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
+          if (mapPan.lastDist > 0 && d > 0) {
+            const sp = svgPoint(mid.x, mid.y);
+            zoomAt(sp.x, sp.y, mapCam.k * (d / mapPan.lastDist));
+            mapPan.moved = true;
+          }
+          mapPan.lastDist = d;
+          return;
+        }
+        if (!mapPan.dragging || mapCam.k <= 1.001) return;
+        const p0 = svgPoint(prev.x, prev.y);
+        const p1 = svgPoint(e.clientX, e.clientY);
+        if (Math.abs(e.clientX - prev.x) + Math.abs(e.clientY - prev.y) > 3) mapPan.moved = true;
+        mapCam.x -= (p1.x - p0.x);
+        mapCam.y -= (p1.y - p0.y);
+        applyMapView();
+      }
+
+      function endPointer(e) {
+        if (!pointers.has(e.pointerId)) return;
+        pointers.delete(e.pointerId);
+        if (pointers.size < 2) mapPan.lastDist = 0;
+        if (pointers.size === 0) {
+          mapPan.dragging = false;
+          wrap.classList.remove("is-panning");
+        } else if (pointers.size === 1) {
+          mapPan.dragging = true;
+        }
+      }
+      window.addEventListener("pointermove", onPointerMove);
+      window.addEventListener("pointerup", endPointer);
+      window.addEventListener("pointercancel", endPointer);
+
+      wrap.addEventListener("click", function (e) {
+        if (!mapPan.moved) return;
+        e.stopPropagation();
+        mapPan.moved = false;
+      }, true);
+    }
+
+    bindMapZoom();
+    buildSightMarks();
+    applyMapView();
+    render();
+  </script>
+</body>
+</html>
