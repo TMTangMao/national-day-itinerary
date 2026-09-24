@@ -4,54 +4,51 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>出游攻略</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/zcool-qingke-huangyou@5.2.5/index.css">
   <style>
-    :root {
-      --ink: #1c1c1c;
-      --mute: #6b7280;
-    }
     * { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; }
     html, body { margin: 0; }
     body {
-      overflow-x: hidden;
       min-height: 100vh;
       font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
-      color: var(--ink);
-      background: linear-gradient(180deg, #d5dbe3 0%, #e7ebf0 42%, #eef1f4 100%);
+      color: #1c1c1c;
+      background: #fff;
     }
     header {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       gap: 16px;
-      max-width: 1180px;
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 22px 28px 8px;
+      padding: 22px 28px 4px;
     }
     h1 {
       margin: 0;
-      font-size: 22px;
+      font-size: 18px;
       font-weight: 700;
-      letter-spacing: 0.18em;
+      letter-spacing: 0.22em;
     }
-    .meta { color: var(--mute); font-size: 13px; letter-spacing: 0.08em; }
+    .meta { color: #8a8f98; font-size: 13px; letter-spacing: 0.08em; }
     .trips {
-      max-width: 1180px;
+      max-width: 1280px;
       margin: 0 auto;
       padding: 16px 28px 40px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 14px;
     }
     a.trip {
       position: relative;
-      display: block;
-      height: min(68vh, 560px);
-      min-height: 380px;
-      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      aspect-ratio: 16 / 9;
+      height: auto;
+      min-height: 0;
+      border-radius: 10px;
       overflow: hidden;
       text-decoration: none;
-      color: #fff;
       background: #d8dde3;
     }
     a.trip img {
@@ -63,35 +60,23 @@
       display: block;
       transition: transform 0.45s ease;
     }
-    a.trip:hover img { transform: scale(1.05); }
-    .cap {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 96px 24px 22px;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.28) 46%, rgba(0, 0, 0, 0) 100%);
-      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
+    a.trip:hover img { transform: scale(1.04); }
+    a.trip strong {
+      position: relative;
+      z-index: 1;
+      font-family: "ZCOOL QingKe HuangYou", "Microsoft YaHei", sans-serif;
+      font-size: clamp(52px, 6.4vw, 92px);
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      line-height: 1;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.18);
     }
-    .cap span {
-      display: block;
-      font-size: 13px;
-      letter-spacing: 0.16em;
-      opacity: 0.92;
-    }
-    .cap strong {
-      display: block;
-      margin-top: 6px;
-      font-family: "STKaiti", "KaiTi", "STSong", serif;
-      font-size: 40px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-    }
+    .jd strong { color: #1f4fad; }
+    .sx strong { color: #ff3b30; }
     @media (max-width: 760px) {
       header, .trips { padding-left: 16px; padding-right: 16px; }
       .trips { grid-template-columns: 1fr; }
-      a.trip { height: 420px; min-height: 0; }
-      .cap strong { font-size: 32px; }
+      a.trip strong { font-size: 56px; }
     }
   </style>
 </head>
@@ -101,19 +86,13 @@
     <span class="meta">2026 · 从武汉出发</span>
   </header>
   <main class="trips">
-    <a class="trip" href="景德镇.html">
-      <img alt="" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/%E5%BE%A1%E7%AA%91%E5%8E%82%E5%85%A5%E5%8F%A3.jpg/960px-%E5%BE%A1%E7%AA%91%E5%8E%82%E5%85%A5%E5%8F%A3.jpg">
-      <div class="cap">
-        <span>中秋 · 9/25–9/26</span>
-        <strong>景德镇</strong>
-      </div>
+    <a class="trip jd" href="景德镇.html">
+      <img alt="" src="https://tr-osdcp.qunarzz.com/tr-osd-tr-space/img/ef98ecc9c6a7d19947f8094f7decfb53.jpg">
+      <strong>景德镇</strong>
     </a>
-    <a class="trip" href="行程计划.html">
+    <a class="trip sx" href="行程计划.html">
       <img alt="" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Yangtze_river_three_gorges.jpg/960px-Yangtze_river_three_gorges.jpg">
-      <div class="cap">
-        <span>国庆 · 10/1–10/6</span>
-        <strong>三峡环线</strong>
-      </div>
+      <strong>三峡环线</strong>
     </a>
   </main>
 </body>
