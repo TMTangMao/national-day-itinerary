@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>2026国庆三峡环线</title>
   <style>
     :root {
@@ -21,7 +21,9 @@
       --line: #2a3f63;
     }
     * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
     html, body { margin: 0; height: 100%; }
+    body { overflow-x: hidden; }
     body {
       font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
       background: var(--paper);
@@ -711,25 +713,52 @@
       .app { grid-template-columns: 1fr; height: auto; }
       .split { width: auto; height: 1px; }
       .map-side { height: auto; position: relative; }
-      .map-wrap { height: 280px; }
+      .map-wrap { height: 280px; flex: none; }
+      .legend, .extras-label { flex-wrap: wrap; row-gap: 8px; }
+      .legend #tog-sights { margin-left: 0; }
+      .app, .map-side, .trip, .week { min-width: 0; max-width: 100%; }
       .trip { height: auto; overflow: visible; }
       .week {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         position: sticky;
         top: 0;
       }
       .trip-scroll { overflow: visible; }
       .board, .hero { grid-template-columns: 1fr; display: block; }
-      .side { margin-top: 16px; max-width: 520px; }
-      .hero-meta { margin-top: 12px; justify-content: flex-start; }
+      .side { margin-top: 16px; max-width: none; }
+      .hero-meta { margin-top: 12px; justify-content: flex-start; flex-wrap: wrap; }
       .hero-meta .stat { text-align: left; }
-      .stay { text-align: left; margin-top: 8px; }
+      .stay { text-align: left; margin-top: 8px; white-space: normal; }
+      .hotel-city { white-space: normal; }
       .boat-grid, .refs-notes { grid-template-columns: 1fr; }
+      .modal-card img { height: 200px; }
     }
     @media (max-width: 640px) {
-      .week { grid-template-columns: repeat(2, 1fr); }
-      .flow { padding-left: 72px; }
-      .block .time { width: 56px; left: -72px; font-size: 12px; }
+      .map-side {
+        padding: 16px 16px 14px;
+        padding-top: max(16px, env(safe-area-inset-top));
+      }
+      .map-side h1 { font-size: 28px; }
+      .kicker { letter-spacing: 0.12em; }
+      .map-wrap { height: 240px; }
+      .map-zoom button { width: 40px; height: 36px; }
+      .week {
+        display: flex;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 8px;
+        padding: 12px 16px;
+      }
+      .week button { flex: 0 0 112px; min-width: 112px; }
+      .trip-scroll {
+        padding: 14px 16px calc(28px + env(safe-area-inset-bottom));
+      }
+      .flow { padding-left: 64px; }
+      .flow::before { left: 52px; }
+      .block .time { width: 48px; left: -64px; font-size: 12px; }
+      .modal { padding: 12px; }
+      .refs-body { padding: 16px; }
     }
   </style>
 </head>

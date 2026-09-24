@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>2026中秋景德镇</title>
   <style>
     :root {
@@ -14,7 +14,9 @@
       --mute: #4d6d8c;
     }
     * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
     html, body { margin: 0; }
+    body { overflow-x: hidden; }
     body {
       font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
       color: var(--ink);
@@ -247,9 +249,24 @@
       .foods { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 860px) {
+      header {
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 12px;
+        padding: 10px 16px 12px;
+        padding-top: max(10px, env(safe-area-inset-top));
+      }
+      h1 { font-size: 22px; letter-spacing: 0.08em; }
+      .seal { width: 44px; height: 44px; font-size: 12px; }
+      .meta { flex-basis: 100%; letter-spacing: 0.04em; }
+      .refs-btn { margin-left: 0; padding: 8px 12px; }
+      .wrap, .foods-sec { padding-left: 16px; padding-right: 16px; }
       .wrap { grid-template-columns: 1fr; }
       .side { position: static; }
       .sights, .foods { grid-template-columns: 1fr; }
+      .modal { padding: 12px; }
+      .modal-card { border-width: 4px; padding: 16px 16px 20px; }
+      .modal-close { padding: 8px 12px; }
     }
   </style>
 </head>
