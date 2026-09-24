@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2026 行程</title>
+  <style>
+    :root {
+      --paper: #0b1220;
+      --ink: #e8eef8;
+      --mute: #8aa0c0;
+      --accent: #38bdf8;
+      --gold: #e8b86d;
+      --land: #f59e0b;
+      --mint: #34d399;
+      --line: #2a3f63;
+      --card: #121c30;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+    }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 64px 28px 80px;
+    }
+    .kicker {
+      margin: 0;
+      font-size: 12px;
+      letter-spacing: 0.28em;
+      color: var(--mute);
+    }
+    h1 {
+      margin: 10px 0 8px;
+      font-family: "STSong", "SimSun", serif;
+      font-size: 48px;
+      font-weight: 600;
+    }
+    .lead {
+      margin: 0 0 36px;
+      max-width: 36em;
+      color: #a8b8d4;
+      line-height: 1.7;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    a.card {
+      display: flex;
+      flex-direction: column;
+      min-height: 280px;
+      padding: 22px 22px 18px;
+      text-decoration: none;
+      color: inherit;
+      background: var(--card);
+      border: 1px solid var(--line);
+    }
+    a.card:hover { border-color: var(--accent); }
+    .when {
+      margin: 0;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      color: var(--gold);
+    }
+    a.card h2 {
+      margin: 14px 0 8px;
+      font-family: "STSong", "SimSun", serif;
+      font-size: 32px;
+      font-weight: 600;
+    }
+    a.card p {
+      margin: 0;
+      color: #a8b8d4;
+      line-height: 1.65;
+      font-size: 14px;
+    }
+    .meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: auto;
+      padding-top: 22px;
+    }
+    .meta span {
+      border: 1px solid var(--line);
+      padding: 4px 8px;
+      font-size: 12px;
+      color: #d5e2f5;
+    }
+    .go {
+      margin-top: 16px;
+      color: var(--accent);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+    }
+    @media (max-width: 760px) {
+      h1 { font-size: 36px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <p class="kicker">2026 · 从武汉出发</p>
+    <h1>两条行程</h1>
+    <p class="lead">中秋先去景德镇过两天，国庆再走三峡环线。两条线路分开排，互不挤在同一张地图里。</p>
+    <div class="grid">
+      <a class="card" href="景德镇.html">
+        <p class="when">中秋 · 9/25–9/26</p>
+        <h2>景德镇</h2>
+        <p>两天一晚。周五进陶阳里，晚上赶陶溪川市集，周六上午看古窑，下午回武汉。</p>
+        <div class="meta">
+          <span>2 天 1 晚</span>
+          <span>高铁</span>
+          <span>住陶公寓</span>
+        </div>
+        <div class="go">打开行程</div>
+      </a>
+      <a class="card" href="行程计划.html">
+        <p class="when">国庆 · 10/1–10/6</p>
+        <h2>三峡环线</h2>
+        <p>武汉、荆州、恩施、奉节，宜昌返回。巫山和巴东可以按时间加。自驾看堵点，火车对车次。</p>
+        <div class="meta">
+          <span>6 天</span>
+          <span>自驾 / 火车</span>
+          <span>环线</span>
+        </div>
+        <div class="go">打开行程</div>
+      </a>
+    </div>
+  </main>
+</body>
+</html>
