@@ -26,6 +26,7 @@
     *::-webkit-scrollbar { width: 8px; height: 8px; }
     *::-webkit-scrollbar-track { background: var(--porcelain); }
     *::-webkit-scrollbar-thumb { background: #8eafd0; border-radius: 8px; }
+    .topbar { position: sticky; top: 0; z-index: 4; background: #fff; }
     .keyborder { height: 14px; background: #fff; border-bottom: 2px solid var(--cobalt-deep); }
     .keyborder svg { display: block; width: 100%; height: 14px; }
     header {
@@ -35,9 +36,6 @@
       padding: 10px 28px 12px;
       background: #fff;
       border-bottom: 1px solid var(--line);
-      position: sticky;
-      top: 0;
-      z-index: 4;
     }
     .home { color: var(--cobalt); text-decoration: none; font-size: 13px; letter-spacing: 0.18em; }
     h1 {
@@ -64,15 +62,17 @@
     }
     .meta { color: var(--mute); font-size: 13px; letter-spacing: 0.1em; }
     .refs-btn {
-      margin-left: auto;
-      font-family: inherit;
-      border: 1px solid var(--cobalt);
+      display: block;
+      margin: 0 auto;
+      max-width: 1380px;
+      padding: 4px 28px 28px;
+      border: 0;
       background: transparent;
-      color: var(--cobalt);
+      color: var(--mute);
+      font-family: inherit;
+      font-size: 12px;
+      letter-spacing: 0.08em;
       cursor: pointer;
-      letter-spacing: 0.16em;
-      padding: 8px 16px;
-      white-space: nowrap;
     }
     .wrap {
       display: grid;
@@ -181,8 +181,17 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
-    .sight .facts { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--mute); }
+    .sight .facts { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--mute); }
     .sight .facts b { color: var(--cobalt); font-weight: 600; }
+    .sight .facts .book {
+      color: #fff;
+      background: var(--cobalt-deep);
+      font-weight: 600;
+      line-height: 1.4;
+      padding: 1px 7px;
+      border-radius: 2px;
+      letter-spacing: 0.08em;
+    }
     .stars { color: var(--cobalt); font-size: 13px; letter-spacing: 2px; }
     .stars i { font-style: normal; color: #c3d4e6; }
     /* ---- 吃食 ---- */
@@ -235,7 +244,10 @@
       opacity: 1;
       visibility: visible;
       pointer-events: auto;
+      overscroll-behavior: contain;
     }
+    html.modal-open,
+    html.modal-open body { overflow: hidden; }
     .modal-card {
       width: min(600px, 100%);
       max-height: 86vh;
@@ -277,8 +289,7 @@
       h1 { font-size: 22px; letter-spacing: 0.08em; }
       .seal { width: 44px; height: 44px; font-size: 12px; }
       .meta { flex-basis: 100%; letter-spacing: 0.04em; }
-      .refs-btn { margin-left: 0; padding: 8px 12px; }
-      .wrap, .foods-sec { padding-left: 16px; padding-right: 16px; }
+      .wrap, .foods-sec, .refs-btn { padding-left: 16px; padding-right: 16px; }
       .wrap { grid-template-columns: 1fr; }
       .side { position: static; }
       .sights, .foods { grid-template-columns: 1fr; }
@@ -289,6 +300,7 @@
   </style>
 </head>
 <body>
+  <div class="topbar">
   <div class="keyborder" aria-hidden="true">
     <svg viewBox="0 0 1200 14" preserveAspectRatio="none">
       <defs>
@@ -304,8 +316,8 @@
     <h1>中秋 · 景德镇</h1>
     <div class="seal">丙午<br>中秋</div>
     <span class="meta">9/25–9/26 · 高铁往返 · 住陶公寓</span>
-    <button class="refs-btn" id="refs-open" type="button">参考资料</button>
   </header>
+  </div>
   <div class="wrap">
     <aside class="side">
       <div>
@@ -352,10 +364,19 @@
       <div class="sights" id="sights"></div>
     </section>
   </div>
+    <section class="foods-sec">
+    <p class="section-title">网红打卡 · 点开看在哪</p>
+    <div class="sights" id="checks"></div>
+  </section>
+  <section class="foods-sec">
+    <p class="section-title">餐馆 · 点开看招牌</p>
+    <div class="foods" id="rests"></div>
+  </section>
   <section class="foods-sec">
     <p class="section-title">瓷都吃食 · 点开看吃法</p>
     <div class="foods" id="foods"></div>
   </section>
+  <button class="refs-btn" id="refs-open" type="button">参考资料</button>
   <div class="modal" id="sight-modal">
     <div class="modal-card">
       <button class="modal-close" id="sight-close" type="button">关闭</button>
@@ -384,21 +405,33 @@
       <p>中秋放假 9/25（周五）至 9/27（周日）。这条只住一晚，用 9/25–9/26，周日留在武汉。</p>
       <p>去程 9/25 G1991 武汉 10:06 → 景德镇北 13:22。返程 9/26 G3097 景德镇北 20:36 → 武汉 23:00。两程都已出票。进出都用景德镇北，不是老景德镇站。</p>
       <p>陶溪川免费，周五至周日 16:00–22:00 有创意市集。御窑博物院免费，需预约，周二至周日 9:00–22:00。古窑民俗博览区约 95 元。陶阳里街区票价口径约 60 元，以景区当天为准。</p>
+      <p>网红打卡参考迈得丘《景德镇两日旅游攻略》视频里标出的无语佛、受气瓶。餐馆按景德镇本地排队店整理：乐乐大排档、欧记大排档、回家吃饭、牛骨粉、寻味三宝。营业和排队以当天为准。</p>
       <p>酒店为陶溪川内的陶公寓。景点和吃食图片来自互联网，版权归原站点。</p>
     </div>
   </div>
   <script>
     var PLACEHOLDER = "data:image/svg+xml," + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='640' height='360'><rect width='640' height='360' fill='#dce8f4'/><text x='320' y='186' font-size='28' fill='#1a56a0' text-anchor='middle' font-family='serif'>景德镇</text></svg>");
     var SIGHTS = [
-      { id: "yuyao", name: "陶阳里 · 御窑", tag: "窑址", stars: 5, img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/%E5%BE%A1%E7%AA%91%E5%8E%82%E5%85%A5%E5%8F%A3.jpg/960px-%E5%BE%A1%E7%AA%91%E5%8E%82%E5%85%A5%E5%8F%A3.jpg", ticket: "博物院免费", ticketNote: "御窑博物院免费，需预约。陶阳里街区另售票，常见约 60 元，以现场为准。", dist: "约 2 公里", distNote: "从陶公寓步行或骑车约 20 分钟。", intro: "珠山一带的御窑遗址和老窑砖，红墙瓷瓦好拍照。博物院周二闭馆，中秋周五、周六都开，可看到 22:00。" },
+      { id: "yuyao", name: "陶阳里 · 御窑", tag: "窑址", stars: 5, book: "需预约", img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/%E5%BE%A1%E7%AA%91%E5%8E%82%E5%85%A5%E5%8F%A3.jpg/960px-%E5%BE%A1%E7%AA%91%E5%8E%82%E5%85%A5%E5%8F%A3.jpg", ticket: "博物院免费", ticketNote: "御窑博物院免费，需预约。陶阳里街区另售票，常见约 60 元，以现场为准。", dist: "约 2 公里", distNote: "从陶公寓步行或骑车约 20 分钟。", intro: "珠山一带的御窑遗址和老窑砖，红墙瓷瓦好拍照。博物院周二闭馆，中秋周五、周六都开，可看到 22:00。" },
       { id: "taoxichuan", name: "陶溪川", tag: "夜市集", stars: 5, img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0a/Taoxichuan_factory_20241019.jpg/960px-Taoxichuan_factory_20241019.jpg", ticket: "免费", ticketNote: "街区不收门票。周五至周日 16:00–22:00 创意市集。", dist: "住这里", distNote: "陶公寓就在陶溪川。市集在步行范围内。", intro: "宇宙瓷厂旧址改的文创街区。中秋这天是周五，晚上市集正开着，买杯子可以，别在这儿耗掉整个下午。" },
       { id: "guyue", name: "古窑民俗博览区", tag: "5A", stars: 4, img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/%E6%99%AF%E5%BE%B7%E9%95%87%E5%8F%A4%E7%AA%91%E6%B0%91%E4%BF%97%E5%8D%9A%E8%A7%88%E5%8C%BA_04.jpg/960px-%E6%99%AF%E5%BE%B7%E9%95%87%E5%8F%A4%E7%AA%91%E6%B0%91%E4%BF%97%E5%8D%9A%E8%A7%88%E5%8C%BA_04.jpg", ticket: "约 95 元", ticketNote: "国家 5A。镇窑、作坊和拉坯在景区内，预留 3 小时。", dist: "约 8 公里", distNote: "昌江区古窑路。从陶公寓打车约 20 分钟。", intro: "城里就能看龙窑、镇窑和手工制瓷作坊，还有老艺人现场拉坯。两天一晚不去瑶里、不去三宝，把半天留给这里。" },
-      { id: "museum", name: "中国陶瓷博物馆", tag: "博物馆", stars: 4, img: "http://n.sinaimg.cn/sinakd20221115ac/134/w2000h1334/20221115/014f-dfc014ace0040ce1aa17596d1b024209.jpg", ticket: "免费", ticketNote: "需提前预约。按预约时段进。", dist: "约 2 公里", distNote: "在陶溪川南侧。看完古窑如果还早，再来这里。", intro: "瓷的通史馆，从宋影青到元青花一次看全。时间不够就放弃，不要压缩周五的市集。" },
+      { id: "museum", name: "中国陶瓷博物馆", tag: "博物馆", stars: 4, book: "需预约", img: "http://n.sinaimg.cn/sinakd20221115ac/134/w2000h1334/20221115/014f-dfc014ace0040ce1aa17596d1b024209.jpg", ticket: "免费", ticketNote: "需提前预约。按预约时段进。", dist: "约 2 公里", distNote: "在陶溪川南侧。看完古窑如果还早，再来这里。", intro: "瓷的通史馆，从宋影青到元青花一次看全。时间不够就放弃，不要压缩周五的市集。" },
       { id: "diaosu", name: "雕塑瓷厂", tag: "市集", stars: 4, img: "https://pic.tt.jxnews.com.cn/upload/images/202410/442116b1-50ec-4a6f-bd8d-96758af9b410.jpg", ticket: "免费", ticketNote: "厂区免费。乐天市集一般在周六上午，摊位另收。", dist: "约 2 公里", distNote: "老厂在陶溪川东北，骑车约 10 分钟。", intro: "老雕塑瓷厂里的工作室和市集。周六上午有乐天陶社创意市集，比陶溪川更偏手作。" },
       { id: "sanbao", name: "三宝国际陶艺村", tag: "村落", stars: 3, img: "https://youimg1.c-ctrip.com/target/100414000000wcyl6F980.jpg", ticket: "免费", ticketNote: "进村免费，个别美术馆、工作室另收费。", dist: "约 9 公里", distNote: "城东南山谷里，打车约 25 分钟。回程车少，留好司机电话。", intro: "山沟里的陶艺村，美术馆、工作室、溪水一路排开。想去要拿出半天，会挤掉古窑或博物馆。" },
       { id: "changnan", name: "昌南里", tag: "街区", stars: 3, img: "https://newbbs-fd.zol-img.com.cn/t_s1200x5000/g4/M05/0A/0F/ChMly12Q3WKIOCfmAAtrp4ITfocAAX6SgK3ZuMAC2u_589.jpg", ticket: "免费", ticketNote: "开放式街区。", dist: "约 3 公里", distNote: "昌江边上，打车约 10 分钟。", intro: "昌江边的新街区，大瓷碗建筑在这里。晚上亮灯，饭后散步顺路。" },
       { id: "fuliang", name: "浮梁古县衙", tag: "古建", stars: 2, img: "http://n.sinaimg.cn/sinacn10113/639/w914h525/20190611/dca4-hyeztys7304384.jpg", ticket: "约 50 元", ticketNote: "县衙景区门票，以现场为准。", dist: "约 15 公里", distNote: "浮梁县城，打车约 30 分钟。", intro: "保存完整的清代县衙，「商人重利轻别离，前月浮梁买茶去」的浮梁。出城景点，去了就回不来赶市集。" },
       { id: "yaoli", name: "瑶里古镇", tag: "古镇", stars: 2, img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Fuliang_Yaoli_2017.12.31_10-25-07.jpg/960px-Fuliang_Yaoli_2017.12.31_10-25-07.jpg", ticket: "进镇免费", ticketNote: "古镇不收门票，景点联票常见约 110 元，以景区为准。", dist: "约 50 公里", distNote: "浮梁县东北山区，车程 1 小时以上。两天一晚不建议去。", intro: "瓷源茶乡，瑶河边的徽派古镇。风景好但太远，这趟只住一晚，先放在清单里。" }
+    ];
+    var CHECKS = [
+      { id: "wuyufo", name: "无语佛", tag: "打卡", stars: 4, book: "需预约", img: "http://n.sinaimg.cn/sinakd20230815s/639/w719h720/20230815/bdfd-6ae44b800fef2e5cea2c4bb431703db2.jpg", ticket: "跟博物馆", ticketNote: "在中国陶瓷博物馆里，不单独售票。博物馆免费，需预约。", dist: "约 2 公里", distNote: "陶溪川南侧。周五下午到了如果还早，可以先来看这一尊。", intro: "博物馆里的网红瓷佛，戴着花冠，一脸无语。迈得丘两日攻略视频把这一处标成打卡点，进馆才能拍到。" },
+      { id: "shouqi", name: "受气瓶", tag: "打卡", stars: 4, img: "http://k.sinaimg.cn/n/sinakd20122/500/w900h1200/20241224/9c37-cdcc4bcd6d705857da9d550ff03a9e15.jpg/w700d1q75cms.jpg", ticket: "免费", ticketNote: "三宝村里的装置，进村不收门票。早上人少，中午以后要排队合影。", dist: "约 9 公里", distNote: "在三宝国际陶艺村。打车约 25 分钟，拍完可以顺路逛村里的工作室。", intro: "一只巨大的瓷瓶，名字就叫受气瓶，是三宝村最常被视频拿出来的合影点。去三宝就为了拍这个的话，预留一小时够用。" }
+    ];
+    var RESTS = [
+      { name: "乐乐大排档", tag: "小黄鱼", img: "https://p9.itc.cn/images01/20220227/f12fbfb5b49c429cade621d21cca9a3d.jpeg", desc: "浙江路创始店，主打酥炸小黄鱼、牛蛙、鸡爪。本地晚饭排队店，经常要等很久。", when: "珠山区浙江路。周六晚饭前去更从容。周五晚上要赶陶溪川市集，可能排不上。" },
+      { name: "欧记大排档", tag: "瓦罐汤", img: "http://n.sinaimg.cn/sinakd20210609ac/272/w640h432/20210609/6b42-krhvrxt0979954.jpg", desc: "和乐乐一类的夜宵排档，瓦罐汤、辣炒小炒是常点的。浙江路、陶溪川附近都有店。", when: "住陶溪川就近选陶溪川店。午饭、晚饭都开，晚上也要取号。" },
+      { name: "回家吃饭", tag: "家常", img: "https://x0.ifengimg.com/res/2020/E8D40302C581F3273CC1D60DFC6B57542F22C254_size177_w1080_h835.jpeg", desc: "江西家常菜，豆冲鱼头、烧鸡爪这类本地菜。比排档好坐，人均不高。", when: "陶溪川、雕塑瓷厂、豪德都有店。逛完街区直接去最近的一家。" },
+      { name: "牛骨粉", tag: "早点", img: "http://n.sinaimg.cn/sinakd20230331s/602/w600h802/20230331/e907-b0ef1d2f0ba4727fa04de79acca42765.jpg", desc: "陶溪川周边的牛骨粉，骨汤配本地米粉。吴记、樊氏都是这一路，挑离公寓近的。", when: "周六早上吃。配一碗冷粉或一份饺子粑。" },
+      { name: "寻味三宝", tag: "土菜", img: "https://youimg1.c-ctrip.com/target/100414000000wcyl6F980.jpg", desc: "三宝村里的土菜馆，去受气瓶、工作室时中午不用回城。", when: "三宝村内。一般 11:00–14:00、17:00–20:30，以当天为准。" }
     ];
     var FOODS = [
       { name: "饺子粑", tag: "咸鲜", img: "https://n.sinaimg.cn/sinakd10103/182/w1080h702/20211203/03a3-d809a26a6d9a0ce926be3a6b1b068bc3.jpg", desc: "米浆磨粉做皮，包萝卜丝、韭菜或豆干馅，蒸熟后皮是半透明的。景德镇人一天的开始。", when: "周五晚饭或周六早点，陶溪川周边小店都有。" },
@@ -436,6 +469,12 @@
         var bs = btn.querySelectorAll(".facts b");
         bs[0].textContent = s.ticket;
         bs[1].textContent = s.dist;
+        if (s.book) {
+          var book = document.createElement("span");
+          book.className = "book";
+          book.textContent = s.book;
+          btn.querySelector(".facts").appendChild(book);
+        }
         btn.addEventListener("click", function () { openSight(s); });
         box.appendChild(btn);
       });
@@ -463,7 +502,7 @@
           document.getElementById("food-tag").textContent = f.tag;
           document.getElementById("food-desc").textContent = f.desc;
           document.getElementById("food-when").textContent = f.when;
-          document.getElementById("food-modal").classList.add("on");
+          showModal(document.getElementById("food-modal"));
         });
         box.appendChild(btn);
       });
@@ -480,15 +519,99 @@
       document.getElementById("sight-dist").textContent = s.dist;
       document.getElementById("sight-dist-note").textContent = s.distNote;
       document.getElementById("sight-intro").textContent = s.intro;
-      document.getElementById("sight-modal").classList.add("on");
+      showModal(document.getElementById("sight-modal"));
+    }
+    var pageScrollY = 0;
+    function lockPage() {
+      if (document.documentElement.classList.contains("modal-open")) return;
+      pageScrollY = window.scrollY;
+      document.body.style.position = "fixed";
+      document.body.style.top = "-" + pageScrollY + "px";
+      document.body.style.left = "0";
+      document.body.style.right = "0";
+      document.body.style.width = "100%";
+      document.documentElement.classList.add("modal-open");
+    }
+    function unlockPage() {
+      if (!document.documentElement.classList.contains("modal-open")) return;
+      document.documentElement.classList.remove("modal-open");
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.width = "";
+      window.scrollTo(0, pageScrollY);
+    }
+    function showModal(el) {
+      el.classList.add("on");
+      lockPage();
     }
     function closeModals() {
-      document.getElementById("sight-modal").classList.remove("on");
-      document.getElementById("food-modal").classList.remove("on");
-      document.getElementById("refs-modal").classList.remove("on");
+      document.querySelectorAll(".modal.on").forEach(function (el) { el.classList.remove("on"); });
+      window.setTimeout(function () {
+        if (!document.querySelector(".modal.on")) unlockPage();
+      }, 320);
+    }
+    function renderChecks() {
+      var box = document.getElementById("checks");
+      CHECKS.forEach(function (s) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "sight";
+        btn.innerHTML = "<img alt=''><div class='sight-body'><div class='sight-top'><strong></strong><em></em></div><div class='stars'></div><p class='intro'></p><div class='facts'><span>门票 <b></b></span><span>距陶公寓 <b></b></span></div></div>";
+        var img = btn.querySelector("img");
+        img.src = s.img;
+        img.alt = s.name;
+        imgFallback(img);
+        btn.querySelector("strong").textContent = s.name;
+        btn.querySelector("em").textContent = s.tag;
+        btn.querySelector(".stars").innerHTML = starHtml(s.stars);
+        btn.querySelector(".intro").textContent = s.intro;
+        var bs = btn.querySelectorAll(".facts b");
+        bs[0].textContent = s.ticket;
+        bs[1].textContent = s.dist;
+        if (s.book) {
+          var book = document.createElement("span");
+          book.className = "book";
+          book.textContent = s.book;
+          btn.querySelector(".facts").appendChild(book);
+        }
+        btn.addEventListener("click", function () { openSight(s); });
+        box.appendChild(btn);
+      });
+    }
+    function renderRests() {
+      var box = document.getElementById("rests");
+      RESTS.forEach(function (f) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "food";
+        btn.innerHTML = "<img alt=''><div class='food-body'><b></b><em></em><span></span></div>";
+        var img = btn.querySelector("img");
+        img.src = f.img;
+        img.alt = f.name;
+        imgFallback(img);
+        btn.querySelector("b").textContent = f.name;
+        btn.querySelector("em").textContent = f.tag;
+        btn.querySelector("span").textContent = f.desc;
+        btn.addEventListener("click", function () {
+          var mimg = document.getElementById("food-img");
+          mimg.src = f.img;
+          mimg.alt = f.name;
+          imgFallback(mimg);
+          document.getElementById("food-title").textContent = f.name;
+          document.getElementById("food-tag").textContent = f.tag;
+          document.getElementById("food-desc").textContent = f.desc;
+          document.getElementById("food-when").textContent = f.when;
+          showModal(document.getElementById("food-modal"));
+        });
+        box.appendChild(btn);
+      });
     }
     renderSights();
     renderFoods();
+    renderChecks();
+    renderRests();
     document.querySelectorAll(".pin").forEach(function (pin) {
       pin.addEventListener("click", function () {
         var s = SIGHTS.filter(function (x) { return x.id === pin.getAttribute("data-id"); })[0];
@@ -500,7 +623,7 @@
       document.getElementById(k + "-modal").addEventListener("click", closeModals);
       document.querySelector("#" + k + "-modal .modal-card").addEventListener("click", function (e) { e.stopPropagation(); });
     });
-    document.getElementById("refs-open").addEventListener("click", function () { document.getElementById("refs-modal").classList.add("on"); });
+    document.getElementById("refs-open").addEventListener("click", function () { showModal(document.getElementById("refs-modal")); });
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeModals(); });
   </script>
 </body>
