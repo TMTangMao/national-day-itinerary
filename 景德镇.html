@@ -218,7 +218,7 @@
     }
     /* ---- 弹窗 ---- */
     .modal {
-      display: none;
+      display: flex;
       position: fixed;
       inset: 0;
       background: rgba(12, 40, 70, 0.5);
@@ -226,8 +226,16 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.28s ease, visibility 0.28s ease;
     }
-    .modal.on { display: flex; }
+    .modal.on {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
     .modal-card {
       width: min(600px, 100%);
       max-height: 86vh;
@@ -237,6 +245,16 @@
       outline: 1px solid #d5e4f2;
       outline-offset: -12px;
       padding: 22px 22px 26px;
+      opacity: 0;
+      transform: translateY(18px) scale(0.97);
+      transition: opacity 0.28s ease, transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .modal.on .modal-card {
+      opacity: 1;
+      transform: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .modal, .modal-card { transition: none; }
     }
     .modal-card img { width: 100%; max-height: 300px; object-fit: cover; display: block; margin-bottom: 12px; background: #dce8f4; }
     .modal-close { float: right; border: 1px solid var(--line); background: transparent; cursor: pointer; color: var(--ink); }
