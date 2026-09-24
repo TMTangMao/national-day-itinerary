@@ -3,147 +3,119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>2026 行程</title>
+  <title>出游攻略</title>
   <style>
     :root {
-      --paper: #0b1220;
-      --ink: #e8eef8;
-      --mute: #8aa0c0;
-      --accent: #38bdf8;
-      --gold: #e8b86d;
-      --land: #f59e0b;
-      --mint: #34d399;
-      --line: #2a3f63;
-      --card: #121c30;
+      --bg: #f3f4f6;
+      --ink: #1c1c1c;
+      --mute: #6b7280;
     }
     * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
     html { -webkit-text-size-adjust: 100%; }
-    body { overflow-x: hidden; }
+    html, body { margin: 0; }
     body {
+      overflow-x: hidden;
+      min-height: 100vh;
       font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
-      background: var(--paper);
       color: var(--ink);
+      background: var(--bg);
     }
-    .wrap {
-      max-width: 980px;
+    header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      max-width: 1180px;
       margin: 0 auto;
-      padding: 64px 28px 80px;
-    }
-    .kicker {
-      margin: 0;
-      font-size: 12px;
-      letter-spacing: 0.28em;
-      color: var(--mute);
+      padding: 22px 28px 8px;
     }
     h1 {
-      margin: 10px 0 8px;
-      font-family: "STSong", "SimSun", serif;
-      font-size: 48px;
-      font-weight: 600;
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
     }
-    .lead {
-      margin: 0 0 36px;
-      max-width: 36em;
-      color: #a8b8d4;
-      line-height: 1.7;
-    }
-    .grid {
+    .meta { color: var(--mute); font-size: 13px; letter-spacing: 0.08em; }
+    .trips {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 16px 28px 40px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
-    a.card {
-      display: flex;
-      flex-direction: column;
-      min-height: 280px;
-      padding: 22px 22px 18px;
+    a.trip {
+      position: relative;
+      display: block;
+      height: min(68vh, 560px);
+      min-height: 380px;
+      border-radius: 18px;
+      overflow: hidden;
       text-decoration: none;
-      color: inherit;
-      background: var(--card);
-      border: 1px solid var(--line);
+      color: #fff;
+      background: #d8dde3;
     }
-    a.card:hover { border-color: var(--accent); }
-    .when {
-      margin: 0;
-      font-size: 12px;
-      letter-spacing: 0.16em;
-      color: var(--gold);
+    a.trip img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.45s ease;
     }
-    a.card h2 {
-      margin: 14px 0 8px;
-      font-family: "STSong", "SimSun", serif;
-      font-size: 32px;
-      font-weight: 600;
+    a.trip:hover img { transform: scale(1.05); }
+    .cap {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 96px 24px 22px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.28) 46%, rgba(0, 0, 0, 0) 100%);
+      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
     }
-    a.card p {
-      margin: 0;
-      color: #a8b8d4;
-      line-height: 1.65;
-      font-size: 14px;
-    }
-    .meta {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: auto;
-      padding-top: 22px;
-    }
-    .meta span {
-      border: 1px solid var(--line);
-      padding: 4px 8px;
-      font-size: 12px;
-      color: #d5e2f5;
-    }
-    .go {
-      margin-top: 16px;
-      color: var(--accent);
+    .cap span {
+      display: block;
       font-size: 13px;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.16em;
+      opacity: 0.92;
+    }
+    .cap strong {
+      display: block;
+      margin-top: 6px;
+      font-family: "STKaiti", "KaiTi", "STSong", serif;
+      font-size: 40px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
     }
     @media (max-width: 760px) {
-      .wrap {
-        padding: 28px 16px calc(40px + env(safe-area-inset-bottom));
-        padding-left: max(16px, env(safe-area-inset-left));
-        padding-right: max(16px, env(safe-area-inset-right));
-      }
-      h1 { font-size: 34px; }
-      .kicker { letter-spacing: 0.16em; }
-      .lead { margin-bottom: 24px; }
-      .grid { grid-template-columns: 1fr; }
-      a.card { min-height: 0; }
+      header, .trips { padding-left: 16px; padding-right: 16px; }
+      .trips { grid-template-columns: 1fr; }
+      a.trip { height: 420px; min-height: 0; }
+      .cap strong { font-size: 32px; }
     }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <p class="kicker">2026 · 从武汉出发</p>
-    <h1>两条行程</h1>
-    <p class="lead">中秋先去景德镇过两天，国庆再走三峡环线。两条线路分开排，互不挤在同一张地图里。</p>
-    <div class="grid">
-      <a class="card" href="景德镇.html">
-        <p class="when">中秋 · 9/25–9/26</p>
-        <h2>景德镇</h2>
-        <p>两天一晚。周五进陶阳里，晚上赶陶溪川市集，周六上午看古窑，下午回武汉。</p>
-        <div class="meta">
-          <span>2 天 1 晚</span>
-          <span>高铁</span>
-          <span>住陶公寓</span>
-        </div>
-        <div class="go">打开行程</div>
-      </a>
-      <a class="card" href="行程计划.html">
-        <p class="when">国庆 · 10/1–10/6</p>
-        <h2>三峡环线</h2>
-        <p>武汉、荆州、恩施、奉节，宜昌返回。巫山和巴东可以按时间加。自驾看堵点，火车对车次。</p>
-        <div class="meta">
-          <span>6 天</span>
-          <span>自驾 / 火车</span>
-          <span>环线</span>
-        </div>
-        <div class="go">打开行程</div>
-      </a>
-    </div>
+  <header>
+    <h1>出游攻略</h1>
+    <span class="meta">2026 · 从武汉出发</span>
+  </header>
+  <main class="trips">
+    <a class="trip" href="景德镇.html">
+      <img alt="" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/%E5%BE%A1%E7%AA%91%E5%8E%82%E5%85%A5%E5%8F%A3.jpg/960px-%E5%BE%A1%E7%AA%91%E5%8E%82%E5%85%A5%E5%8F%A3.jpg">
+      <div class="cap">
+        <span>中秋 · 9/25–9/26</span>
+        <strong>景德镇</strong>
+      </div>
+    </a>
+    <a class="trip" href="行程计划.html">
+      <img alt="" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Yangtze_river_three_gorges.jpg/960px-Yangtze_river_three_gorges.jpg">
+      <div class="cap">
+        <span>国庆 · 10/1–10/6</span>
+        <strong>三峡环线</strong>
+      </div>
+    </a>
   </main>
 </body>
 </html>
