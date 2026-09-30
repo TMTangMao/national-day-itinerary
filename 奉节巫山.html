@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>奉节 · 巫山</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <style>
+    :root {
+      --ink: #1c2c28;
+      --mute: #5c726c;
+      --water: #1a6a72;
+      --paper: #eef2f0;
+      --eat: #8a4e28;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    html, body { margin: 0; }
+    body {
+      overflow-x: hidden;
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    .mouth { position: relative; height: 52vh; min-height: 300px; max-height: 520px; overflow: hidden; }
+    .mouth img.cover { width: 100%; height: 100%; object-fit: cover; object-position: center 70%; display: block; }
+    .mouth::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(6, 16, 18, 0.28) 0%, rgba(6, 16, 18, 0.05) 40%, rgba(6, 16, 18, 0.55) 100%);
+    }
+    .home {
+      position: absolute; z-index: 1; top: 18px; left: 22px;
+      color: #f4fff8; text-decoration: none; font-size: 13px; letter-spacing: 0.18em;
+    }
+    .mouth-copy { position: absolute; z-index: 1; left: 0; right: 0; bottom: 28px; text-align: center; color: #f7fffb; }
+    .mouth-copy .kicker { margin: 0 0 6px; letter-spacing: 0.42em; font-size: 13px; }
+    .mouth-copy h1 {
+      margin: 0;
+      font-family: "STKaiti", "KaiTi", "STSong", serif;
+      font-size: clamp(40px, 6vw, 68px);
+      font-weight: 400;
+      letter-spacing: 0.28em;
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
+    }
+    .mouth-copy p:last-child { margin: 8px 0 0; letter-spacing: 0.2em; font-size: 14px; }
+    .page { width: min(1120px, calc(100% - 32px)); margin: 28px auto 20px; }
+    .city {
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #d7e4de;
+      border-left: 6px solid var(--water);
+      box-shadow: 0 12px 28px rgba(20, 40, 36, 0.08);
+      margin: 0 0 8px;
+    }
+    .reach { position: relative; height: 168px; overflow: hidden; }
+    .reach img { width: 100%; height: 100%; object-fit: cover; object-position: center 58%; display: block; }
+    .reach::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, rgba(8, 18, 16, 0.5), rgba(8, 18, 16, 0.08) 62%);
+    }
+    .reach-copy { position: absolute; z-index: 1; left: 22px; bottom: 14px; color: #f7fffb; }
+    .reach-copy span { letter-spacing: 0.28em; font-size: 13px; }
+    .city-body { padding: 0 18px 8px; }
+    .city-title {
+      position: sticky; top: 0; z-index: 2;
+      display: flex; align-items: baseline; gap: 14px;
+      margin: 0 -18px 16px; padding: 14px 18px 12px;
+      background: #fff;
+      border-bottom: 1px solid #e4eeea;
+    }
+    .city-title h2 {
+      margin: 0;
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: 36px; font-weight: 400; letter-spacing: 0.16em;
+    }
+    .city-title p { margin: 0; color: var(--mute); font-size: 13px; letter-spacing: 0.06em; }
+    .block { margin: 0 0 18px; }
+    .label {
+      display: flex; align-items: baseline; gap: 12px;
+      margin: 0 0 12px;
+    }
+    .label b {
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: 28px; font-weight: 400; letter-spacing: 0.2em; color: var(--water);
+    }
+    .label span { color: var(--mute); font-size: 13px; letter-spacing: 0.08em; }
+    .sight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .sight, .dish, .cross, .modal-close { font-family: inherit; }
+    .sight, .dish {
+      display: block; width: 100%; text-align: left; cursor: pointer;
+      background: #fff; border: 0; padding: 0; color: inherit; overflow: hidden;
+      border-radius: 10px; box-shadow: 0 8px 18px rgba(20, 40, 36, 0.06);
+    }
+    .sight:hover, .dish:hover, .cross:hover { box-shadow: 0 12px 26px rgba(20, 40, 36, 0.14); }
+    .sight img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; background: #d5e0dc; }
+    .sight-copy, .dish-copy { padding: 10px 14px 12px; }
+    .sight strong, .dish strong {
+      display: block;
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: 22px; font-weight: 400; letter-spacing: 0.06em;
+    }
+    .sight p, .dish p {
+      margin: 4px 0 6px; color: var(--mute); font-size: 13px; line-height: 1.5;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .sight small, .dish small { color: var(--water); font-size: 12px; }
+    .stars { color: var(--water); font-size: 12px; letter-spacing: 1px; }
+    .stars i { font-style: normal; color: #c5d4ce; }
+    .food-block {
+      background: #f6efe4;
+      border-radius: 12px;
+      padding: 14px 14px 4px;
+      margin-bottom: 16px;
+    }
+    .food-block .label b { color: var(--eat); }
+    .food-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .dish img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; background: #eadfce; }
+    .dish small { color: var(--eat); }
+    .food-block .stars { color: var(--eat); }
+    .crossing { margin: 8px 0 32px; }
+    .cross {
+      position: relative; display: block; width: 100%; border: 0; padding: 0;
+      border-radius: 14px; overflow: hidden; cursor: pointer; color: #f7fffb; text-align: left;
+    }
+    .cross img { width: 100%; height: 340px; object-fit: cover; object-position: center 62%; display: block; background: #9bb0aa; }
+    .cross-copy {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      padding: 56px 22px 18px;
+      background: linear-gradient(transparent, rgba(6, 18, 16, 0.78));
+    }
+    .cross-copy em { font-style: normal; letter-spacing: 0.32em; font-size: 12px; }
+    .cross-copy strong {
+      display: block; margin-top: 4px;
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: 32px; font-weight: 400; letter-spacing: 0.1em;
+    }
+    .cross-copy p { margin: 6px 0 0; font-size: 13px; line-height: 1.6; max-width: 640px; }
+    .vids { margin: 10px 4px 0; font-size: 13px; color: var(--mute); }
+    .vids a { color: var(--water); margin-right: 14px; }
+    .refs-btn {
+      display: block; margin: 4px auto 28px; border: 0; background: transparent;
+      color: #7d948e; font-family: inherit; font-size: 12px; letter-spacing: 0.08em; cursor: pointer;
+    }
+    .modal {
+      display: flex; position: fixed; inset: 0; background: rgba(8, 20, 18, 0.62); z-index: 5;
+      align-items: center; justify-content: center; padding: 24px;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.28s ease, visibility 0.28s ease;
+    }
+    .modal.on { opacity: 1; visibility: visible; pointer-events: auto; overscroll-behavior: contain; }
+    html.modal-open, html.modal-open body { overflow: hidden; }
+    .modal-card {
+      width: min(600px, 100%); max-height: 86vh; overflow: auto; background: #f7faf8;
+      border-radius: 4px 16px 4px 16px; border-top: 6px solid #174e58;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35); padding: 22px 22px 26px;
+      opacity: 0; transform: translateY(18px) scale(0.97);
+      transition: opacity 0.28s ease, transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .modal.on .modal-card { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { .modal, .modal-card { transition: none; } }
+    .modal-card img { width: 100%; max-height: 300px; object-fit: cover; display: block; margin-bottom: 12px; background: #d5e0dc; }
+    .modal-close { float: right; border: 1px solid #d5e0dc; background: transparent; cursor: pointer; color: var(--ink); }
+    .modal-card h3 { margin: 8px 0 12px; font-family: "STKaiti", "KaiTi", serif; font-size: 28px; font-weight: 400; }
+    .fact { display: grid; grid-template-columns: 3em 1fr; gap: 4px 10px; margin-bottom: 12px; }
+    .fact span { color: var(--mute); font-size: 13px; }
+    .modal-card p { margin: 0 0 8px; line-height: 1.65; }
+    @media (max-width: 860px) {
+      .mouth { height: 38vh; min-height: 220px; }
+      .home { top: max(12px, env(safe-area-inset-top)); left: 14px; }
+      .mouth-copy h1 { letter-spacing: 0.14em; }
+      .page { width: calc(100% - 20px); margin-top: 16px; }
+      .reach { height: 132px; }
+      .city-body { padding: 0 12px 4px; }
+      .city-title { margin: 0 -12px 12px; padding: 12px 12px 10px; flex-wrap: wrap; }
+      .city-title h2 { font-size: 30px; }
+      .city-title p { display: block; width: 100%; }
+      .sight-grid, .food-grid { grid-template-columns: 1fr; }
+      .cross img { height: 240px; }
+      .cross-copy strong { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="mouth">
+    <img class="cover" alt="" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Qutang_Gorge_on_Changjiang.jpg/960px-Qutang_Gorge_on_Changjiang.jpg">
+    <a class="home" href="index.html">出游攻略</a>
+    <div class="mouth-copy">
+      <p class="kicker">瞿塘峡 · 巫峡</p>
+      <h1>奉节 · 巫山</h1>
+      <p>两座城，各自看景、各自吃饭</p>
+    </div>
+  </header>
+  <main class="page">
+    <section class="city">
+      <div class="reach">
+        <img alt="" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/%E9%87%8D%E5%BA%86%E5%A5%89%E8%8A%82-%E4%B8%89%E5%B3%A1%E4%B9%8B%E5%B7%85_Peak_of_the_Three_Gorges.jpg/960px-%E9%87%8D%E5%BA%86%E5%A5%89%E8%8A%82-%E4%B8%89%E5%B3%A1%E4%B9%8B%E5%B7%85_Peak_of_the_Three_Gorges.jpg">
+        <div class="reach-copy"><span>上游 · 瞿塘峡口</span></div>
+      </div>
+      <div class="city-body">
+        <header class="city-title">
+          <h2>奉节</h2>
+          <p>下面的景点和美食都在这座城里</p>
+        </header>
+        <div class="block">
+          <h3 class="label"><b>景点</b><span>点开看图，自己选</span></h3>
+          <div class="sight-grid" id="fj-sights"></div>
+        </div>
+        <div class="block food-block">
+          <h3 class="label"><b>美食</b><span>县城里吃</span></h3>
+          <div class="food-grid" id="fj-foods"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="crossing">
+      <button class="cross" type="button" data-id="boat">
+        <img alt="" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/%E7%99%BD%E5%B8%9D%E5%9F%8E%C2%B7%E7%9E%BF%E5%A1%98%E5%B3%A1_03.jpg/960px-%E7%99%BD%E5%B8%9D%E5%9F%8E%C2%B7%E7%9E%BF%E5%A1%98%E5%B3%A1_03.jpg">
+        <span class="cross-copy">
+          <em>顺江而下</em>
+          <strong>瞿塘峡 · 小红船</strong>
+          <p id="ferry-intro"></p>
+        </span>
+      </button>
+      <p class="vids">赖导
+        <a href="https://www.bilibili.com/video/BV1F9U8BzE3F/" target="_blank" rel="noopener">上集 · 奉节到巫山</a>
+        <a href="https://www.bilibili.com/video/BV1TwS7BmETP/" target="_blank" rel="noopener">下集 · 巫峡看神女峰</a>
+      </p>
+    </section>
+
+    <section class="city">
+      <div class="reach">
+        <img alt="" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Wu_Gorge_2016_6.jpg/960px-Wu_Gorge_2016_6.jpg">
+        <div class="reach-copy"><span>下游 · 巫峡</span></div>
+      </div>
+      <div class="city-body">
+        <header class="city-title">
+          <h2>巫山</h2>
+          <p>下面的景点和美食都在这座城里</p>
+        </header>
+        <div class="block">
+          <h3 class="label"><b>景点</b><span>点开看图，自己选</span></h3>
+          <div class="sight-grid" id="ws-sights"></div>
+        </div>
+        <div class="block food-block">
+          <h3 class="label"><b>美食</b><span>县城里吃</span></h3>
+          <div class="food-grid" id="ws-foods"></div>
+        </div>
+      </div>
+    </section>
+    <button class="refs-btn" id="refs-open" type="button">参考资料</button>
+  </main>
+
+  <div class="modal" id="card-modal">
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <button class="modal-close" type="button" id="card-close">关闭</button>
+      <img id="m-img" alt="">
+      <h3 id="m-name"></h3>
+      <div class="fact" id="m-facts"></div>
+      <p id="m-intro"></p>
+      <p id="m-tip"></p>
+    </div>
+  </div>
+  <div class="modal" id="refs-modal">
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <button class="modal-close" type="button" data-close>关闭</button>
+      <h3>参考</h3>
+      <p>景点、船班和吃食整理自赖导两集：<a href="https://www.bilibili.com/video/BV1F9U8BzE3F/" target="_blank" rel="noopener">上集 奉节→巫山</a>，<a href="https://www.bilibili.com/video/BV1TwS7BmETP/" target="_blank" rel="noopener">下集</a>。票价是船上扫码的大约数，出发前以码头当日为准。</p>
+      <p>白帝城旺季 3/1–10/30 约 100 元，淡季约 60 元。观夔门含在景区里。神女大扶梯单程约 3 元。看神女峰正脸坐巫山到巴东的水上公交，巫山段约 40 元，鳊鱼溪换小白船约 50 元，船上扫码，不用预订。</p>
+      <p>三峡之巅、小寨天坑、小三峡、神女溪、翡翠凉粉、搭搭面来自公开介绍。三峡之巅大门票免费，上下山交通另计。天坑、小三峡、神女溪的票价各处写得不一样，出发前以景区当日为准。</p>
+    </div>
+  </div>
+  <script>
+    var PLACEHOLDER = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400"><rect width="100%" height="100%" fill="#d5e0dc"/><text x="50%" y="50%" fill="#5c726c" font-size="22" text-anchor="middle" dominant-baseline="middle">图片暂缺</text></svg>');
+    var SIGHTS = [
+      {
+        id: "baidi", name: "白帝城", bank: "fj", stars: 5,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Baidicheng_2014.jpg/960px-Baidicheng_2014.jpg",
+        ticket: "约 100 元", where: "县城以东约 10 公里",
+        intro: "瞿塘峡口的白帝城，李白「朝辞白帝彩云间」写的就是这儿。水位抬升后城在山上，江在脚下。托孤堂、观夔门是城里两处主要看点。",
+        tip: "旺季 3 月到 10 月约 100 元，淡季约 60 元。国庆按旺季。车程大约 20 到 30 分钟。"
+      },
+      {
+        id: "kuimen", name: "夔门", bank: "fj", stars: 5,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Qutang_Gorge_on_Changjiang.jpg/960px-Qutang_Gorge_on_Changjiang.jpg",
+        ticket: "含在白帝城", where: "与白帝城同在峡口",
+        intro: "长江在这里被两岸绝壁收成一道门，是瞿塘峡入口。十元纸币背面那座门，指的就是夔门。白帝城高处能看，小红船过峡时甲板上也能看。",
+        tip: "想在船上再看一遍，选奉节到巫山的小红船，船票约 40 元。"
+      },
+      {
+        id: "peak", name: "三峡之巅", bank: "fj", stars: 5,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/%E9%87%8D%E5%BA%86%E5%A5%89%E8%8A%82-%E4%B8%89%E5%B3%A1%E4%B9%8B%E5%B7%85_Peak_of_the_Three_Gorges.jpg/960px-%E9%87%8D%E5%BA%86%E5%A5%89%E8%8A%82-%E4%B8%89%E5%B3%A1%E4%B9%8B%E5%B7%85_Peak_of_the_Three_Gorges.jpg",
+        ticket: "交通另计", where: "赤甲山顶，夔门之上",
+        intro: "杜甫写「赤甲白盐俱刺天」的那座山。站在赤甲山顶，能俯瞰夔门和长江拐弯。2020 年开园，国家 4A。",
+        tip: "大门票免费，上下山要另坐索道或观光车。大约 8:00 到 19:00 开放。和白帝城在同一片山上，不必同一天挤完。"
+      },
+      {
+        id: "tiankeng", name: "小寨天坑", bank: "fj", stars: 4,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Xiaozhaitiankeng.jpg/960px-Xiaozhaitiankeng.jpg",
+        ticket: "景区售票", where: "兴隆镇，县城以南约 80 公里",
+        intro: "很深的岩溶漏斗。坑口直径大约 500 多米，深大约 660 米，四壁像刀切下去。从坑口走到坑底有两千多级台阶。",
+        tip: "离县城远，要单独留出大半天。天坑和天井峡地缝不在同一个点。门票旺季淡季不一样，出发前再核对。"
+      },
+      {
+        id: "boat", name: "瞿塘峡 · 小红船", bank: "river", stars: 4,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/%E7%99%BD%E5%B8%9D%E5%9F%8E%C2%B7%E7%9E%BF%E5%A1%98%E5%B3%A1_03.jpg/960px-%E7%99%BD%E5%B8%9D%E5%9F%8E%C2%B7%E7%9E%BF%E5%A1%98%E5%B3%A1_03.jpg",
+        ticket: "约 40 元", where: "奉节小红船码头",
+        intro: "奉节小红船码头开往巫山古城码头。常见 8:00、13:20，约 3.5 小时，约 40 元，船上扫码。过白帝城、夔门、瞿塘峡。左边入口去神女峰，右边入口回奉节。",
+        tip: "地图搜「小红船码头」，不去宝塔坪。车可停马路对面，约 15 元一天。回奉节走巫山码头右边入口。"
+      },
+      {
+        id: "lift", name: "神女大扶梯", bank: "ws", stars: 4,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Chongqing_wushan_night_view.jpg/960px-Chongqing_wushan_night_view.jpg",
+        ticket: "约 3 元", where: "巫山县城坡上",
+        intro: "移民后的巫山贴着江岸建在坡上。神女大扶梯是城里上下坡最省事的一段，扶梯、梯坎和江边连着走，就是赖导上集里的山城。",
+        tip: "单程约 3 元，刷卡或扫码。梯坎本身免费。从古城码头步行就能到。"
+      },
+      {
+        id: "shennv", name: "神女峰", bank: "ws", stars: 5,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Spitze-der-Goettin.jpg/960px-Spitze-der-Goettin.jpg",
+        ticket: "随船", where: "水路约 15 公里",
+        intro: "巫山十二峰里最出名的一座，江上看像立在崖上的神女。正脸在巫峡江面上。县城里的神女雕塑是另一处，代替不了江上的峰。",
+        tip: "坐巫山到巴东的水上公交，走古城码头左边入口，牌上写「巫山–神女峰–培石」。开船大约一小时可见正脸。"
+      },
+      {
+        id: "wuxia", name: "巫峡", bank: "ws", stars: 4,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Wu_Gorge_2016_6.jpg/960px-Wu_Gorge_2016_6.jpg",
+        ticket: "约 40 + 50 元", where: "水路约 40 公里",
+        intro: "三峡里最长的一段，大约 40 多公里，两岸十二峰常有云雾。赖导下集走的就是这条水上公交：巫山左边入口，鳊鱼溪换小白船，到巴东。",
+        tip: "全程大约 5 小时。巫山段约 40 元，换小白船约 50 元，船上扫码，不用预订。早上 8:00 有一班。"
+      },
+      {
+        id: "xiaosanxia", name: "小三峡", bank: "ws", stars: 5,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/The_Little_Three_Gorges_along_Daning_river_in_Wushan%2CChongqing.JPG/960px-The_Little_Three_Gorges_along_Daning_river_in_Wushan%2CChongqing.JPG",
+        ticket: "坐船", where: "大宁河，巫山游客中心登船",
+        intro: "大宁河上的龙门峡、巴雾峡、滴翠峡合称小三峡，国家 5A。水比长江清，峡谷更窄，坐船大约半天。再往里是小小三峡。",
+        tip: "从巫山游客中心上船。这一段能看到悬棺。船程里常停大昌古镇，蓄水后镇子迁到更高的坡上。"
+      },
+      {
+        id: "shennvxi", name: "神女溪", bank: "ws", stars: 4,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/%E7%A5%9E%E5%A5%B3%E6%BA%AA_-_panoramio.jpg/960px-%E7%A5%9E%E5%A5%B3%E6%BA%AA_-_panoramio.jpg",
+        ticket: "坐船", where: "巫峡南岸，与神女峰隔江",
+        intro: "当地也叫美女溪，长约 15 公里。从巫山坐船过一段巫峡，到溪口换画舫进去。溪的上游能看到起云峰、净坛峰这一侧的山。",
+        tip: "和江上看神女峰可以放在同一段水路里考虑。溪和峰是两处，峰的正脸仍在大江上。"
+      }
+    ];
+    var FOODS = [
+      {
+        id: "jizi", name: "盬子鸡", bank: "fj", stars: 5,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/Soy_Sauce_Chicken_in_Clay_Pot.JPG/960px-Soy_Sauce_Chicken_in_Clay_Pot.JPG",
+        ticket: "正餐", where: "奉节县城",
+        intro: "奉节的招牌鸡。整鸡用当地做法收汁，适合中午坐下来吃一顿。",
+        tip: "和夔面都在县城解决。想赶船的那天，把这顿放在开船前留得出门的时段。"
+      },
+      {
+        id: "kui", name: "夔面", bank: "fj", stars: 4,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1d/Beef_Noodles_soup_from_Jinyi_Beef_Noodle_Soup_Inn_in_Shenzhen.jpg/960px-Beef_Noodles_soup_from_Jinyi_Beef_Noodle_Soup_Inn_in_Shenzhen.jpg",
+        ticket: "正餐", where: "奉节县城",
+        intro: "奉节本地面。比盬子鸡快，适合白帝城下来随便找一家。",
+        tip: "赖导上集里，奉节晚饭用夔面就够。早饭还有搭搭面，手撕的宽面，常配麦子粑。"
+      },
+      {
+        id: "orange", name: "奉节脐橙", bank: "fj", stars: 4,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/A_Navel_Orange_and_a_Pera_Orange.JPG/960px-A_Navel_Orange_and_a_Pera_Orange.JPG",
+        ticket: "时令", where: "县城、码头都能买",
+        intro: "奉节出产的脐橙，国庆前后正是开始上市的时候。当路上的水果带一份。",
+        tip: "码头和县城超市都有。挑果皮紧、有重量的。"
+      },
+      {
+        id: "fish", name: "巫山烤鱼", bank: "ws", stars: 5,
+        img: "https://x0.ifengimg.com/res/2019/97E2B73E4BD21AFCF6DF508347F129AB8C2B618A_size84_w626_h408.jpeg",
+        ticket: "晚饭", where: "巫山县城",
+        intro: "巫山晚饭的主菜。常见蒜香和泡椒两种口味，鱼连汤一起上桌。",
+        tip: "赖导上集把烤鱼排在到巫山的当晚。三友包子是第二天早上的，晚上不排包子。"
+      },
+      {
+        id: "bao", name: "三友包子", bank: "ws", stars: 4,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Nangua_Baozi_%28chinese_dumplings%29.jpg/960px-Nangua_Baozi_%28chinese_dumplings%29.jpg",
+        ticket: "早点", where: "地图搜「三友包子」",
+        intro: "巫山早上排队的包子铺。馅带辣，出锅快，下午常常卖完。",
+        tip: "赖导上集里的早点。地图搜「三友包子」，早点去。同类老店还有金元、向氏，上午常常卖完。"
+      },
+      {
+        id: "liangfen", name: "翡翠凉粉", bank: "ws", stars: 4,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Pea_liangfen.jpg/960px-Pea_liangfen.jpg",
+        ticket: "小吃", where: "巫山县城",
+        intro: "巫山街头的凉粉。粉条用豌豆或绿豆淀粉做成，浇上酸辣汁，适合下午或饭前吃一口。",
+        tip: "县城小吃摊就能找到。粉是凉的，汁是酸辣的。"
+      }
+    ];
+    function stars(n) {
+      var s = "";
+      for (var i = 1; i <= 5; i++) s += i <= n ? "★" : "<i>★</i>";
+      return '<span class="stars" aria-label="推荐 ' + n + ' 星">' + s + "</span>";
+    }
+    function card(item, kind) {
+      var cls = kind === "eat" ? "dish" : "sight";
+      var copy = kind === "eat" ? "dish-copy" : "sight-copy";
+      return '<button class="' + cls + '" type="button" data-id="' + item.id + '">' +
+        '<img alt="" src="' + item.img + '">' +
+        '<span class="' + copy + '"><strong>' + item.name + '</strong>' +
+        stars(item.stars) +
+        '<p>' + item.intro + '</p>' +
+        '<small>' + item.ticket + ' · ' + item.where + '</small></span></button>';
+    }
+    function fill(list, el, kind) {
+      el.innerHTML = list.map(function (item) { return card(item, kind); }).join("");
+      el.querySelectorAll("img").forEach(function (img) { img.onerror = function () { img.src = PLACEHOLDER; }; });
+    }
+    function find(id) {
+      return SIGHTS.concat(FOODS).filter(function (x) { return x.id === id; })[0];
+    }
+    var scrollY = 0;
+    function lockPage() {
+      scrollY = window.scrollY || 0;
+      document.documentElement.classList.add("modal-open");
+      document.body.style.position = "fixed";
+      document.body.style.top = -scrollY + "px";
+      document.body.style.width = "100%";
+    }
+    function unlockPage() {
+      document.documentElement.classList.remove("modal-open");
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      window.scrollTo(0, scrollY);
+    }
+    function openCard(item) {
+      document.getElementById("m-img").src = item.img;
+      document.getElementById("m-name").textContent = item.name;
+      document.getElementById("m-facts").innerHTML =
+        "<span>推荐</span><span>" + stars(item.stars) + "</span>" +
+        "<span>花费</span><span>" + item.ticket + "</span>" +
+        "<span>位置</span><span>" + item.where + "</span>";
+      document.getElementById("m-intro").textContent = item.intro;
+      document.getElementById("m-tip").textContent = item.tip;
+      show(document.getElementById("card-modal"));
+    }
+    function show(modal) {
+      lockPage();
+      requestAnimationFrame(function () { modal.classList.add("on"); });
+    }
+    function hide(modal) {
+      modal.classList.remove("on");
+      setTimeout(function () {
+        if (!modal.classList.contains("on") && !document.querySelector(".modal.on")) unlockPage();
+      }, 320);
+    }
+    document.querySelector(".page").addEventListener("click", function (e) {
+      var b = e.target.closest("[data-id]");
+      if (b) openCard(find(b.dataset.id));
+    });
+    document.getElementById("card-close").addEventListener("click", function () { hide(document.getElementById("card-modal")); });
+    document.getElementById("card-modal").addEventListener("click", function (e) { if (e.target === this) hide(this); });
+    document.getElementById("refs-open").addEventListener("click", function () { show(document.getElementById("refs-modal")); });
+    document.querySelectorAll("[data-close]").forEach(function (b) {
+      b.addEventListener("click", function () { hide(b.closest(".modal")); });
+    });
+    document.getElementById("refs-modal").addEventListener("click", function (e) { if (e.target === this) hide(this); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") document.querySelectorAll(".modal.on").forEach(hide);
+    });
+    document.getElementById("ferry-intro").textContent = find("boat").intro;
+    document.querySelectorAll("img").forEach(function (img) { img.addEventListener("error", function () { img.src = PLACEHOLDER; }); });
+    fill(SIGHTS.filter(function (x) { return x.bank === "fj"; }), document.getElementById("fj-sights"), "see");
+    fill(FOODS.filter(function (x) { return x.bank === "fj"; }), document.getElementById("fj-foods"), "eat");
+    fill(SIGHTS.filter(function (x) { return x.bank === "ws"; }), document.getElementById("ws-sights"), "see");
+    fill(FOODS.filter(function (x) { return x.bank === "ws"; }), document.getElementById("ws-foods"), "eat");
+  </script>
+</body>
+</html>
