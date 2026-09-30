@@ -45,7 +45,33 @@
       text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
     }
     .mouth-copy p:last-child { margin: 8px 0 0; letter-spacing: 0.2em; font-size: 14px; }
-    .page { width: min(1120px, calc(100% - 32px)); margin: 28px auto 20px; }
+    .page { width: min(1120px, calc(100% - 32px)); margin: 28px auto 20px; display: flex; flex-direction: column; }
+    .pick-wrap {
+      position: sticky; top: 0; z-index: 4;
+      margin: 8px 0 16px; padding: 10px 0 4px;
+      background: var(--paper);
+    }
+    .pick-wrap p { margin: 0 0 8px; color: var(--mute); font-size: 13px; letter-spacing: 0.08em; }
+    .pick {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      margin: 0;
+    }
+    .pick button {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+      border: 1px solid #d7e4de; background: #fff; border-radius: 14px;
+      padding: 12px 18px 14px; cursor: pointer; color: var(--mute); text-align: left;
+    }
+    .pick button b {
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: 30px; font-weight: 400; letter-spacing: 0.18em;
+    }
+    .pick button span { font-size: 12px; letter-spacing: 0.14em; }
+    .pick button.on { background: #174e58; border-color: #174e58; color: #f4fffb; }
+    .page.view-fj .city[data-city="ws"],
+    .page.view-ws .city[data-city="fj"] { display: none; }
+    .city { order: 1; }
+    .crossing { order: 2; }
+    .refs-btn { order: 3; }
     .city {
       background: #fff;
       border-radius: 16px;
@@ -66,7 +92,6 @@
     .reach-copy span { letter-spacing: 0.28em; font-size: 13px; }
     .city-body { padding: 0 18px 8px; }
     .city-title {
-      position: sticky; top: 0; z-index: 2;
       display: flex; align-items: baseline; gap: 14px;
       margin: 0 -18px 16px; padding: 14px 18px 12px;
       background: #fff;
@@ -121,6 +146,28 @@
     .dish img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; background: #eadfce; }
     .dish small { color: var(--eat); }
     .food-block .stars { color: var(--eat); }
+    .verse-block { margin-bottom: 16px; }
+    .verses { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .verse {
+      margin: 0;
+      background: #f3f6f5;
+      border-radius: 12px;
+      padding: 14px 16px 12px;
+    }
+    .verse .lines {
+      margin: 0;
+      font-family: "STKaiti", "KaiTi", "STSong", serif;
+      font-size: 16px;
+      line-height: 1.9;
+      letter-spacing: 0.04em;
+    }
+    .verse footer {
+      margin-top: 10px;
+      color: var(--mute);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+    }
+    .verse footer b { font-weight: 400; color: var(--water); margin-left: 8px; }
     .crossing { margin: 8px 0 32px; }
     .cross {
       position: relative; display: block; width: 100%; border: 0; padding: 0;
@@ -145,6 +192,94 @@
       display: block; margin: 4px auto 28px; border: 0; background: transparent;
       color: #7d948e; font-family: inherit; font-size: 12px; letter-spacing: 0.08em; cursor: pointer;
     }
+    .route {
+      background: #fff; border-radius: 16px; overflow: hidden;
+      border: 1px solid #d7e4de; border-left: 6px solid var(--water);
+      box-shadow: 0 12px 28px rgba(20, 40, 36, 0.08);
+      padding: 18px 18px 8px; margin: 0;
+    }
+    .route-top h2 {
+      margin: 0;
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: 36px; font-weight: 400; letter-spacing: 0.16em;
+    }
+    .route-top p { margin: 6px 0 0; color: var(--mute); font-size: 13px; }
+    .route-map-wrap {
+      margin-top: 14px; overflow-x: auto; border-radius: 12px; background: #f4f7f6;
+    }
+    .route-map { width: 100%; min-width: 640px; height: auto; display: block; }
+    .route-map .go, .route-map .back, .route-map .day {
+      fill: none; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .route-map .go { stroke: #1a6a72; stroke-width: 3; }
+    .route-map .day { stroke: #1a6a72; stroke-width: 3; stroke-dasharray: 2 5; }
+    .route-map .back { stroke: #8a4e28; stroke-width: 3; stroke-dasharray: 8 6; }
+    .route-map .dot { fill: #1a6a72; }
+    .route-map .warn .dot { fill: #8a4e28; }
+    .route-map .jam { fill: #8a4e28; }
+    .route-map .shut { fill: #9a3b32; }
+    .route-map text {
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      font-size: 14px; fill: #1c2c28; pointer-events: none;
+    }
+    .route-map .sub { font-size: 11px; fill: #5c726c; }
+    .route-map .tag { font-size: 12px; fill: #1a6a72; letter-spacing: 0.12em; }
+    .route-map .tag.back-tag { fill: #8a4e28; }
+    .route-map .pin { cursor: pointer; }
+    .route-map .hit { fill: transparent; }
+    .route-map .ring { fill: none; stroke: #1a6a72; stroke-width: 1.5; }
+    .route-map .pin.on .dot { fill: #174e58; }
+    .route-map .pin.on .ring { stroke: #174e58; stroke-width: 2.5; }
+    .route-map .pin.on text { fill: #174e58; }
+    .map-legend {
+      display: flex; flex-wrap: wrap; gap: 14px;
+      margin: 8px 2px 0; color: var(--mute); font-size: 12px;
+    }
+    .map-legend i { display: inline-block; width: 18px; height: 3px; margin-right: 6px; vertical-align: middle; }
+    .map-legend .lg-go { background: #1a6a72; }
+    .map-legend .lg-day { background: repeating-linear-gradient(90deg, #1a6a72 0 2px, transparent 2px 7px); }
+    .map-legend .lg-back { background: repeating-linear-gradient(90deg, #8a4e28 0 7px, transparent 7px 12px); }
+    .map-legend .lg-jam, .map-legend .lg-shut {
+      width: 8px; height: 8px; border-radius: 1px; transform: rotate(45deg); margin: 0 8px 0 2px;
+    }
+    .map-legend .lg-jam { background: #8a4e28; }
+    .map-legend .lg-shut { background: #9a3b32; }
+    .days { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 16px 0; }
+    .day {
+      background: #f3f6f5; border-radius: 12px; padding: 14px 16px 12px;
+    }
+    .day h3 {
+      margin: 0 0 6px;
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: 22px; font-weight: 400; letter-spacing: 0.08em;
+    }
+    .day h3 span { margin-left: 10px; color: var(--water); font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 13px; letter-spacing: 0.04em; }
+    .day p { margin: 0 0 6px; font-size: 14px; line-height: 1.65; }
+    .day p:last-child { margin-bottom: 0; }
+    .note {
+      margin: 0 0 16px; padding: 12px 14px; border-radius: 12px;
+      background: #f6efe4; color: #5c4636; font-size: 13px; line-height: 1.65;
+    }
+    .wx { margin: 14px 0 0; }
+    .wx-head {
+      display: flex; align-items: baseline; gap: 12px; margin: 0 0 8px;
+    }
+    .wx-head b {
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: 22px; font-weight: 400; letter-spacing: 0.12em; color: var(--water);
+    }
+    .wx-head span, .wx-now { color: var(--mute); font-size: 12px; }
+    .wx-now { margin: 0 0 8px; }
+    .wx-days { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .wx-card { background: #f3f6f5; border-radius: 12px; padding: 12px 14px; }
+    .wx-card > b {
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: 22px; font-weight: 400; letter-spacing: 0.08em;
+    }
+    .wx-row { display: flex; justify-content: space-between; gap: 8px; margin: 8px 0 0; font-size: 13px; }
+    .wx-row strong { font-weight: 400; }
+    .wx-row span { color: var(--mute); text-align: right; }
+    .wx-miss { margin: 0; color: var(--mute); font-size: 13px; }
     .modal {
       display: flex; position: fixed; inset: 0; background: rgba(8, 20, 18, 0.62); z-index: 5;
       align-items: center; justify-content: center; padding: 24px;
@@ -173,12 +308,14 @@
       .home { top: max(12px, env(safe-area-inset-top)); left: 14px; }
       .mouth-copy h1 { letter-spacing: 0.14em; }
       .page { width: calc(100% - 20px); margin-top: 16px; }
+      .days, .wx-days { grid-template-columns: 1fr; }
+      .route-top h2 { font-size: 30px; }
       .reach { height: 132px; }
       .city-body { padding: 0 12px 4px; }
       .city-title { margin: 0 -12px 12px; padding: 12px 12px 10px; flex-wrap: wrap; }
       .city-title h2 { font-size: 30px; }
       .city-title p { display: block; width: 100%; }
-      .sight-grid, .food-grid { grid-template-columns: 1fr; }
+      .sight-grid, .food-grid, .verses { grid-template-columns: 1fr; }
       .cross img { height: 240px; }
       .cross-copy strong { font-size: 26px; }
     }
@@ -191,11 +328,114 @@
     <div class="mouth-copy">
       <p class="kicker">瞿塘峡 · 巫峡</p>
       <h1>奉节 · 巫山</h1>
-      <p>两座城，各自看景、各自吃饭</p>
+      <p>10月4日从枣阳到巫山，6日回武汉</p>
     </div>
   </header>
-  <main class="page">
-    <section class="city">
+  <main class="page view-ws">
+    <section class="route">
+      <header class="route-top">
+        <h2>自驾三天</h2>
+        <p>枣阳出发，吃住都在巫山。5日去奉节，当天回来。橙色是近年国庆易堵，红色是这段时间封闭。</p>
+      </header>
+      <div class="route-map-wrap">
+        <svg class="route-map" viewBox="0 0 720 268" role="img" aria-label="自驾示意。4日从枣阳经襄阳、宜昌、巴东到巫山。5日巫山和奉节往返。6日从巫山经宜昌、呼北、荆州回武汉。点奉节或巫山可切换下面的城。">
+          <path class="go" d="M648 46 L528 64 L392 118 L262 90 L152 70"/>
+          <path class="day" d="M152 70 Q102 42, 52 84"/>
+          <path class="back" d="M392 118 C 430 152, 456 166, 486 172 L 586 196 L 668 214"/>
+          <text class="tag" x="430" y="52">4日去</text>
+          <text class="tag day-tag" x="62" y="36">5日往返</text>
+          <text class="tag back-tag" x="348" y="152">6日回</text>
+          <g class="warn">
+            <circle class="dot" cx="528" cy="64" r="5"/>
+            <text x="508" y="88">襄阳</text>
+            <text class="sub" x="496" y="104">二广易堵</text>
+          </g>
+          <g class="warn">
+            <circle class="dot" cx="392" cy="118" r="5"/>
+            <text x="404" y="114">宜昌</text>
+            <text class="sub" x="404" y="130">进山前慢</text>
+          </g>
+          <g class="warn">
+            <circle class="dot" cx="262" cy="90" r="5"/>
+            <text x="242" y="116">巴东</text>
+            <text class="sub" x="232" y="132">服务区车密</text>
+          </g>
+          <polygon class="jam" points="328,96 334,104 328,112 322,104"><title>宜昌进山前，近年国庆易堵</title></polygon>
+          <g class="shut">
+            <polygon points="486,164 494,172 486,180 478,172"/>
+            <text x="448" y="198">呼北</text>
+            <text class="sub" x="430" y="214">往武汉封闭</text>
+          </g>
+          <g class="warn">
+            <circle class="dot" cx="586" cy="196" r="5"/>
+            <text x="560" y="184">荆州</text>
+            <text class="sub" x="548" y="220">返程易堵</text>
+          </g>
+          <g>
+            <circle class="dot" cx="648" cy="46" r="5"/>
+            <text x="624" y="30">枣阳</text>
+            <text class="sub" x="608" y="16">6:30 出发</text>
+          </g>
+          <g>
+            <circle class="dot" cx="668" cy="214" r="5"/>
+            <text x="646" y="236">武汉</text>
+            <text class="sub" x="624" y="250">绕城按导航</text>
+          </g>
+          <g class="pin on" data-city="ws" role="button" tabindex="0" aria-label="切换到巫山">
+            <circle class="hit" cx="152" cy="70" r="18"/>
+            <circle class="ring" cx="152" cy="70" r="9"/>
+            <circle class="dot" cx="152" cy="70" r="5"/>
+            <text x="128" y="58">巫山</text>
+            <text class="sub" x="112" y="92">吃住两晚</text>
+          </g>
+          <g class="pin" data-city="fj" role="button" tabindex="0" aria-label="切换到奉节">
+            <circle class="hit" cx="52" cy="84" r="18"/>
+            <circle class="ring" cx="52" cy="84" r="9"/>
+            <circle class="dot" cx="52" cy="84" r="5"/>
+            <text x="28" y="112">奉节</text>
+            <text class="sub" x="14" y="128">5日白天</text>
+          </g>
+        </svg>
+      </div>
+      <p class="map-legend">
+        <span><i class="lg-go"></i>4日到巫山</span>
+        <span><i class="lg-day"></i>5日往返奉节</span>
+        <span><i class="lg-back"></i>6日返程</span>
+        <span><i class="lg-jam"></i>近年国庆易堵</span>
+        <span><i class="lg-shut"></i>这段时间封闭</span>
+      </p>
+      <div class="wx" id="wx">
+        <p class="wx-head"><b>天气</b><span>打开页面时从预报更新</span></p>
+        <p class="wx-now" id="wx-now"></p>
+        <div class="wx-days" id="wx-days"><p class="wx-miss">正在取这三天的预报…</p></div>
+      </div>
+      <div class="days">
+        <article class="day">
+          <h3>4日<span>到巫山</span></h3>
+          <p>约 506 公里。路况好大约 6.5 小时，国庆按 8 到 10 小时。走福银、二广、沪蓉，到巫山下。晚上住巫山，晚饭一家馆子或甩一杯。</p>
+          <p>三峡大坝、翻坝景区和宜巴公路假日车多，这次走高速。去奉节约 1 小时，留到明天。</p>
+        </article>
+        <article class="day">
+          <h3>5日<span>去奉节</span></h3>
+          <p>早上三友包子，然后去奉节，大约 1 小时。白天看白帝城、夔门，中午在奉节吃。傍晚开回巫山，晚饭再在巫山吃。</p>
+          <p>小寨天坑在奉节以南，当天回巫山排不下。小三峡、神女峰、小红船都要大半天，车也上不了船。</p>
+        </article>
+        <article class="day">
+          <h3>6日<span>回武汉</span></h3>
+          <p>7:00 前从巫山走。想吃三友就再早一点，吃完上路。G50 往武汉方向，呼北互通到枝江的主线封到 10 月 8 日，在呼北分流。</p>
+          <p>返程高峰再加绕行，按 9 到 12 小时，晚上到武汉。当天不再加景点。</p>
+        </article>
+      </div>
+      <p class="note">封闭按 2026 年 9 月通告：安福寺、鸦南、白洋往武汉的匝道也关。武汉绕城藏龙岛至江夏、往武汉一侧在施工。出发当天看导航。国庆小客车高速通常免费，以当年通告为准。</p>
+    </section>
+    <div class="pick-wrap">
+      <p>吃住在巫山，一次看一座</p>
+      <nav class="pick" aria-label="选择城市">
+        <button type="button" data-city="ws" aria-pressed="true"><b>巫山</b><span>4 日晚到 · 6 日早走</span></button>
+        <button type="button" data-city="fj" aria-pressed="false"><b>奉节</b><span>5 日白天</span></button>
+      </nav>
+    </div>
+    <section class="city" data-city="fj">
       <div class="reach">
         <img alt="" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/%E9%87%8D%E5%BA%86%E5%A5%89%E8%8A%82-%E4%B8%89%E5%B3%A1%E4%B9%8B%E5%B7%85_Peak_of_the_Three_Gorges.jpg/960px-%E9%87%8D%E5%BA%86%E5%A5%89%E8%8A%82-%E4%B8%89%E5%B3%A1%E4%B9%8B%E5%B7%85_Peak_of_the_Three_Gorges.jpg">
         <div class="reach-copy"><span>上游 · 瞿塘峡口</span></div>
@@ -203,7 +443,7 @@
       <div class="city-body">
         <header class="city-title">
           <h2>奉节</h2>
-          <p>下面的景点和美食都在这座城里</p>
+          <p>下面的景点、美食、诗词都在这座城里</p>
         </header>
         <div class="block">
           <h3 class="label"><b>景点</b><span>点开看图，自己选</span></h3>
@@ -212,6 +452,27 @@
         <div class="block food-block">
           <h3 class="label"><b>美食</b><span>县城里吃</span></h3>
           <div class="food-grid" id="fj-foods"></div>
+        </div>
+        <div class="block verse-block">
+          <h3 class="label"><b>诗词</b><span>瞿塘峡 · 白帝城 · 夔州</span></h3>
+          <div class="verses">
+            <article class="verse">
+              <p class="lines">朝辞白帝彩云间，<br>千里江陵一日还。<br>两岸猿声啼不住，<br>轻舟已过万重山。</p>
+              <footer>李白 · 早发白帝城<b>白帝城</b></footer>
+            </article>
+            <article class="verse">
+              <p class="lines">中巴之东巴东山，<br>江水开辟流其间。<br>白帝高为三峡镇，<br>瞿塘险过百牢关。</p>
+              <footer>杜甫 · 夔州歌十绝句<b>瞿塘峡</b></footer>
+            </article>
+            <article class="verse">
+              <p class="lines">瞿塘嘈嘈十二滩，<br>人言道路古来难。<br>长恨人心不如水，<br>等闲平地起波澜。</p>
+              <footer>刘禹锡 · 竹枝词<b>瞿塘峡</b></footer>
+            </article>
+            <article class="verse">
+              <p class="lines">风急天高猿啸哀，渚清沙白鸟飞回。<br>无边落木萧萧下，不尽长江滚滚来。<br>万里悲秋常作客，百年多病独登台。<br>艰难苦恨繁霜鬓，潦倒新停浊酒杯。</p>
+              <footer>杜甫 · 登高<b>夔州</b></footer>
+            </article>
+          </div>
         </div>
       </div>
     </section>
@@ -231,7 +492,7 @@
       </p>
     </section>
 
-    <section class="city">
+    <section class="city" data-city="ws">
       <div class="reach">
         <img alt="" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Wu_Gorge_2016_6.jpg/960px-Wu_Gorge_2016_6.jpg">
         <div class="reach-copy"><span>下游 · 巫峡</span></div>
@@ -239,7 +500,7 @@
       <div class="city-body">
         <header class="city-title">
           <h2>巫山</h2>
-          <p>下面的景点和美食都在这座城里</p>
+          <p>下面的景点、美食、诗词都在这座城里</p>
         </header>
         <div class="block">
           <h3 class="label"><b>景点</b><span>点开看图，自己选</span></h3>
@@ -248,6 +509,35 @@
         <div class="block food-block">
           <h3 class="label"><b>美食</b><span>县城里吃</span></h3>
           <div class="food-grid" id="ws-foods"></div>
+        </div>
+        <div class="block verse-block">
+          <h3 class="label"><b>诗词</b><span>巫峡 · 巫山十二峰</span></h3>
+          <div class="verses">
+            <article class="verse">
+              <p class="lines">玉露凋伤枫树林，巫山巫峡气萧森。<br>江间波浪兼天涌，塞上风云接地阴。<br>丛菊两开他日泪，孤舟一系故园心。<br>寒衣处处催刀尺，白帝城高急暮砧。</p>
+              <footer>杜甫 · 秋兴八首<b>巫峡 · 写于夔州</b></footer>
+            </article>
+            <article class="verse">
+              <p class="lines">巫山十二峰，皆在碧虚中。<br>回合云藏日，霏微雨带风。<br>猿声寒过水，树色暮连空。<br>愁向高唐望，清秋见楚宫。</p>
+              <footer>李端 · 巫山高<b>十二峰</b></footer>
+            </article>
+            <article class="verse">
+              <p class="lines">十二巫山见九峰，<br>船头彩翠满秋空。<br>朝云暮雨浑虚语，<br>一夜猿啼明月中。</p>
+              <footer>陆游 · 三峡歌<b>巫峡</b></footer>
+            </article>
+            <article class="verse">
+              <p class="lines">昨夜巫山下，猿声梦里长。<br>桃花飞绿水，三月下瞿塘。<br>雨色风吹去，南行拂楚王。<br>高丘怀宋玉，访古一沾裳。</p>
+              <footer>李白 · 宿巫山下<b>巫山</b></footer>
+            </article>
+            <article class="verse">
+              <p class="lines">巴东三峡巫峡长，<br>猿鸣三声泪沾裳。</p>
+              <footer>渔者歌 · 水经注所引<b>巫峡</b></footer>
+            </article>
+            <article class="verse">
+              <p class="lines">妾在巫山之阳，高丘之阻，<br>旦为朝云，暮为行雨。<br>朝朝暮暮，阳台之下。</p>
+              <footer>宋玉 · 高唐赋<b>神女</b></footer>
+            </article>
+          </div>
         </div>
       </div>
     </section>
@@ -281,35 +571,35 @@
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Baidicheng_2014.jpg/960px-Baidicheng_2014.jpg",
         ticket: "约 100 元", where: "县城以东约 10 公里",
         intro: "瞿塘峡口的白帝城，李白「朝辞白帝彩云间」写的就是这儿。水位抬升后城在山上，江在脚下。托孤堂、观夔门是城里两处主要看点。",
-        tip: "旺季 3 月到 10 月约 100 元，淡季约 60 元。国庆按旺季。车程大约 20 到 30 分钟。"
+        tip: "从巫山过来大约 1 小时进奉节，再到景区 20 到 30 分钟。5日早上先看这里和夔门。旺季 3 月到 10 月约 100 元，淡季约 60 元。国庆按旺季。"
       },
       {
         id: "kuimen", name: "夔门", bank: "fj", stars: 5,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Qutang_Gorge_on_Changjiang.jpg/960px-Qutang_Gorge_on_Changjiang.jpg",
         ticket: "含在白帝城", where: "与白帝城同在峡口",
         intro: "长江在这里被两岸绝壁收成一道门，是瞿塘峡入口。十元纸币背面那座门，指的就是夔门。白帝城高处能看，小红船过峡时甲板上也能看。",
-        tip: "想在船上再看一遍，选奉节到巫山的小红船，船票约 40 元。"
+        tip: "5日在白帝城高处看。想在船上再看一遍，要另留大半天，车不能跟着上船。"
       },
       {
         id: "peak", name: "三峡之巅", bank: "fj", stars: 5,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/%E9%87%8D%E5%BA%86%E5%A5%89%E8%8A%82-%E4%B8%89%E5%B3%A1%E4%B9%8B%E5%B7%85_Peak_of_the_Three_Gorges.jpg/960px-%E9%87%8D%E5%BA%86%E5%A5%89%E8%8A%82-%E4%B8%89%E5%B3%A1%E4%B9%8B%E5%B7%85_Peak_of_the_Three_Gorges.jpg",
         ticket: "交通另计", where: "赤甲山顶，夔门之上",
         intro: "杜甫写「赤甲白盐俱刺天」的那座山。站在赤甲山顶，能俯瞰夔门和长江拐弯。2020 年开园，国家 4A。",
-        tip: "大门票免费，上下山要另坐索道或观光车。大约 8:00 到 19:00 开放。和白帝城在同一片山上，不必同一天挤完。"
+        tip: "大门票免费，上下山要另坐索道或观光车。大约 8:00 到 19:00 开放。和白帝城在同一片山上，5日上午看完白帝城，下午还有时间可以上去，傍晚回巫山。"
       },
       {
         id: "tiankeng", name: "小寨天坑", bank: "fj", stars: 4,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Xiaozhaitiankeng.jpg/960px-Xiaozhaitiankeng.jpg",
         ticket: "景区售票", where: "兴隆镇，县城以南约 80 公里",
         intro: "很深的岩溶漏斗。坑口直径大约 500 多米，深大约 660 米，四壁像刀切下去。从坑口走到坑底有两千多级台阶。",
-        tip: "离县城远，要单独留出大半天。天坑和天井峡地缝不在同一个点。门票旺季淡季不一样，出发前再核对。"
+        tip: "在县城以南约 80 公里，和回巫山不是一条路。5日要当晚回巫山，这天不排。门票旺季淡季不一样，出发前再核对。"
       },
       {
         id: "boat", name: "瞿塘峡 · 小红船", bank: "river", stars: 4,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/%E7%99%BD%E5%B8%9D%E5%9F%8E%C2%B7%E7%9E%BF%E5%A1%98%E5%B3%A1_03.jpg/960px-%E7%99%BD%E5%B8%9D%E5%9F%8E%C2%B7%E7%9E%BF%E5%A1%98%E5%B3%A1_03.jpg",
         ticket: "约 40 元", where: "奉节小红船码头",
         intro: "奉节小红船码头开往巫山古城码头。常见 8:00、13:20，约 3.5 小时，约 40 元，船上扫码。过白帝城、夔门、瞿塘峡。左边入口去神女峰，右边入口回奉节。",
-        tip: "地图搜「小红船码头」，不去宝塔坪。车可停马路对面，约 15 元一天。回奉节走巫山码头右边入口。"
+        tip: "车不能上船。5日要开车回巫山，这天不排。地图搜「小红船码头」，不去宝塔坪。"
       },
       {
         id: "lift", name: "神女大扶梯", bank: "ws", stars: 4,
@@ -352,15 +642,15 @@
         id: "jizi", name: "盬子鸡", bank: "fj", stars: 5,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/Soy_Sauce_Chicken_in_Clay_Pot.JPG/960px-Soy_Sauce_Chicken_in_Clay_Pot.JPG",
         ticket: "正餐", where: "奉节县城",
-        intro: "奉节的招牌鸡。整鸡用当地做法收汁，适合中午坐下来吃一顿。",
-        tip: "和夔面都在县城解决。想赶船的那天，把这顿放在开船前留得出门的时段。"
+        intro: "奉节的招牌鸡。整鸡用当地做法收汁，适合 5 日中午在奉节吃。",
+        tip: "这顿别排到傍晚。晚上要开车回巫山，晚饭在巫山吃。"
       },
       {
         id: "kui", name: "夔面", bank: "fj", stars: 4,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1d/Beef_Noodles_soup_from_Jinyi_Beef_Noodle_Soup_Inn_in_Shenzhen.jpg/960px-Beef_Noodles_soup_from_Jinyi_Beef_Noodle_Soup_Inn_in_Shenzhen.jpg",
         ticket: "正餐", where: "奉节县城",
-        intro: "奉节本地面。比盬子鸡快，适合白帝城下来随便找一家。",
-        tip: "赖导上集里，奉节晚饭用夔面就够。早饭还有搭搭面，手撕的宽面，常配麦子粑。"
+        intro: "奉节本地面。比盬子鸡快，适合白帝城下来中午吃一碗。",
+        tip: "5日中午在奉节吃。晚饭回巫山。搭搭面是奉节早饭，这次早上在巫山吃三友。"
       },
       {
         id: "orange", name: "奉节脐橙", bank: "fj", stars: 4,
@@ -370,18 +660,25 @@
         tip: "码头和县城超市都有。挑果皮紧、有重量的。"
       },
       {
-        id: "fish", name: "巫山烤鱼", bank: "ws", stars: 5,
+        id: "fish", name: "一家馆子烤鱼", bank: "ws", stars: 5,
         img: "https://x0.ifengimg.com/res/2019/97E2B73E4BD21AFCF6DF508347F129AB8C2B618A_size84_w626_h408.jpeg",
-        ticket: "晚饭", where: "巫山县城",
-        intro: "巫山晚饭的主菜。常见蒜香和泡椒两种口味，鱼连汤一起上桌。",
-        tip: "赖导上集把烤鱼排在到巫山的当晚。三友包子是第二天早上的，晚上不排包子。"
+        ticket: "晚饭", where: "宁江路，地图搜「一家馆子」",
+        intro: "巫山烤鱼，这家做成纸包鱼。蒜香和泡椒都能点，鱼连汤一起上桌。",
+        tip: "4日晚到和 5 日回来都能吃。地图搜「一家馆子」。"
+      },
+      {
+        id: "bbq", name: "甩一杯", bank: "ws", stars: 4,
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Mixed_Grill_%28Beef%2C_Pork_%26_Chicken%29_on_Sizzling_Plate.jpg/960px-Mixed_Grill_%28Beef%2C_Pork_%26_Chicken%29_on_Sizzling_Plate.jpg",
+        ticket: "晚饭", where: "广东中路神女广场，地图搜「甩一杯」",
+        intro: "巫山的铁板烤肉。肉和菜铺在铁板上自己烤，是县城的老店。",
+        tip: "4日或 5 日的晚饭。人多时一桌不便宜，自己翻烤，油会溅。"
       },
       {
         id: "bao", name: "三友包子", bank: "ws", stars: 4,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Nangua_Baozi_%28chinese_dumplings%29.jpg/960px-Nangua_Baozi_%28chinese_dumplings%29.jpg",
         ticket: "早点", where: "地图搜「三友包子」",
         intro: "巫山早上排队的包子铺。馅带辣，出锅快，下午常常卖完。",
-        tip: "赖导上集里的早点。地图搜「三友包子」，早点去。同类老店还有金元、向氏，上午常常卖完。"
+        tip: "5日去奉节前、6日上路前吃。地图搜「三友包子」，早点去。同类老店还有金元、向氏，上午常常卖完。"
       },
       {
         id: "liangfen", name: "翡翠凉粉", bank: "ws", stars: 4,
@@ -469,6 +766,99 @@
     fill(FOODS.filter(function (x) { return x.bank === "fj"; }), document.getElementById("fj-foods"), "eat");
     fill(SIGHTS.filter(function (x) { return x.bank === "ws"; }), document.getElementById("ws-sights"), "see");
     fill(FOODS.filter(function (x) { return x.bank === "ws"; }), document.getElementById("ws-foods"), "eat");
+    function showCity(id, scroll) {
+      var page = document.querySelector(".page");
+      page.classList.toggle("view-fj", id === "fj");
+      page.classList.toggle("view-ws", id === "ws");
+      document.querySelectorAll(".pick button, .route-map .pin").forEach(function (b) {
+        var on = b.dataset.city === id;
+        b.classList.toggle("on", on);
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+      if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
+      if (scroll) {
+        var top = document.querySelector(".pick").getBoundingClientRect().top + window.scrollY - 8;
+        window.scrollTo(0, Math.max(0, top));
+      }
+    }
+    document.querySelector(".pick").addEventListener("click", function (e) {
+      var b = e.target.closest("[data-city]");
+      if (b) showCity(b.dataset.city, true);
+    });
+    document.querySelector(".route-map").addEventListener("click", function (e) {
+      var p = e.target.closest(".pin");
+      if (p) showCity(p.dataset.city, true);
+    });
+    document.querySelector(".route-map").addEventListener("keydown", function (e) {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      var p = e.target.closest(".pin");
+      if (!p) return;
+      e.preventDefault();
+      showCity(p.dataset.city, true);
+    });
+    showCity(location.hash === "#fj" ? "fj" : "ws", false);
+    function sky(code) {
+      var n = Number(code);
+      var table = {
+        0: "晴", 1: "大部晴", 2: "多云", 3: "阴",
+        45: "雾", 48: "雾",
+        51: "小雨", 53: "小雨", 55: "小雨", 56: "冻雨", 57: "冻雨",
+        61: "小雨", 63: "中雨", 65: "大雨", 66: "冻雨", 67: "冻雨",
+        71: "小雪", 73: "中雪", 75: "大雪", 77: "雪",
+        80: "阵雨", 81: "阵雨", 82: "大阵雨", 85: "阵雪", 86: "阵雪",
+        95: "雷雨", 96: "雷雨", 99: "雷雨"
+      };
+      return table[n] || "多云";
+    }
+    function loadWeather() {
+      var places = [
+        { id: "zy", name: "枣阳", lat: 32.131, lon: 112.767 },
+        { id: "fj", name: "奉节", lat: 30.965, lon: 109.399 },
+        { id: "ws", name: "巫山", lat: 31.116, lon: 109.898 },
+        { id: "wh", name: "武汉", lat: 30.579, lon: 114.292 }
+      ];
+      var days = [
+        { date: "2026-10-04", label: "4日", ids: ["zy", "ws"] },
+        { date: "2026-10-05", label: "5日", ids: ["ws", "fj"] },
+        { date: "2026-10-06", label: "6日", ids: ["ws", "wh"] }
+      ];
+      var box = document.getElementById("wx-days");
+      Promise.all(places.map(function (p) {
+        var url = "https://api.open-meteo.com/v1/forecast?latitude=" + p.lat + "&longitude=" + p.lon +
+          "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max" +
+          "&current=temperature_2m,weather_code&timezone=Asia%2FShanghai&forecast_days=10";
+        return fetch(url).then(function (r) { return r.json(); }).then(function (data) {
+          p.data = data;
+        }).catch(function () { p.data = null; });
+      })).then(function () {
+        var now = ["ws", "fj"].map(function (id) {
+          var p = places.filter(function (x) { return x.id === id; })[0];
+          if (!p.data || !p.data.current) return "";
+          return p.name + " " + Math.round(p.data.current.temperature_2m) + "° " + sky(p.data.current.weather_code);
+        }).filter(Boolean);
+        var nowEl = document.getElementById("wx-now");
+        if (now.length) nowEl.textContent = "此刻 " + now.join(" · ");
+        var any = places.some(function (p) { return p.data && p.data.daily; });
+        if (!any) {
+          box.innerHTML = "<p class=\"wx-miss\">这会儿取不到预报，过一会儿再打开看看。</p>";
+          return;
+        }
+        box.innerHTML = days.map(function (day) {
+          var rows = day.ids.map(function (id) {
+            var p = places.filter(function (x) { return x.id === id; })[0];
+            var daily = p.data && p.data.daily;
+            var i = daily ? daily.time.indexOf(day.date) : -1;
+            if (!daily || i < 0) return "<p class=\"wx-row\"><strong>" + p.name + "</strong><span>暂无</span></p>";
+            var text = sky(daily.weather_code[i]) + " " +
+              Math.round(daily.temperature_2m_min[i]) + "–" + Math.round(daily.temperature_2m_max[i]) +
+              "° · 降水" + daily.precipitation_probability_max[i] + "%";
+            return "<p class=\"wx-row\"><strong>" + p.name + "</strong><span>" + text + "</span></p>";
+          }).join("");
+          return "<article class=\"wx-card\"><b>" + day.label + "</b>" + rows + "</article>";
+        }).join("");
+      });
+    }
+    loadWeather();
   </script>
 </body>
 </html>
