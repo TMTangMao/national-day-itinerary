@@ -212,15 +212,6 @@
     }
     .map-stage { transform-origin: 0 0; }
     .route-map { width: 100%; height: auto; display: block; }
-    .map-zoom {
-      position: absolute; right: 10px; bottom: 10px; z-index: 2;
-      display: flex; flex-direction: column; gap: 6px;
-    }
-    .map-zoom button {
-      width: 40px; height: 40px; padding: 0; border: 0; border-radius: 8px;
-      background: #fff; color: #1a6a72; font-size: 22px; line-height: 1; cursor: pointer;
-      box-shadow: 0 2px 8px rgba(20, 40, 36, 0.16);
-    }
     .route-map .go, .route-map .back, .route-map .day {
       fill: none; stroke-linecap: round; stroke-linejoin: round;
     }
@@ -365,12 +356,8 @@
         <p>枣阳出发，吃住都在巫山。5日去奉节，当天回来。橙色是近年国庆易堵，红色是这段时间封闭。</p>
       </header>
       <div class="route-map-wrap" id="map-wrap">
-        <div class="map-zoom">
-          <button type="button" data-zoom="in" aria-label="放大路线图">+</button>
-          <button type="button" data-zoom="out" aria-label="缩小路线图">−</button>
-        </div>
         <div class="map-stage" id="map-stage">
-        <svg class="route-map" viewBox="0 0 720 268" role="img" aria-label="自驾示意。4日从枣阳经襄阳、宜昌、巴东到巫山。5日巫山和奉节往返。6日从巫山经宜昌、呼北、荆州回武汉。点奉节或巫山可切换下面的城。双指或右下角按钮可放大。">
+        <svg class="route-map" viewBox="0 0 720 268" role="img" aria-label="自驾示意。4日从枣阳经襄阳、宜昌、巴东到巫山。5日巫山和奉节往返。6日从巫山经宜昌、呼北、荆州回武汉。点奉节或巫山可切换下面的城。双指可放大。">
           <path class="go" d="M648 46 L528 64 L392 118 L262 90 L152 70"/>
           <path class="day" d="M152 70 Q102 42, 52 84"/>
           <path class="back" d="M392 118 C 430 152, 456 166, 486 172 L 586 196 L 668 214"/>
@@ -920,12 +907,6 @@
         clamp();
         apply();
       }
-      wrap.querySelector(".map-zoom").addEventListener("click", function (e) {
-        var b = e.target.closest("[data-zoom]");
-        if (!b) return;
-        var rect = wrap.getBoundingClientRect();
-        zoomAt(scale * (b.dataset.zoom === "in" ? 1.4 : 0.72), rect.left + rect.width / 2, rect.top + rect.height / 2);
-      });
       wrap.addEventListener("wheel", function (e) {
         if (!e.ctrlKey && !e.metaKey) return;
         e.preventDefault();
@@ -933,7 +914,6 @@
       }, { passive: false });
       var finger = null;
       function beginTouch(e) {
-        if (e.touches.length === 1 && e.target.closest(".map-zoom")) return;
         if (e.touches.length >= 2) {
           e.preventDefault();
           var a = e.touches[0], b = e.touches[1];
