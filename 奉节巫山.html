@@ -133,6 +133,7 @@
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
     .sight small, .dish small { color: var(--water); font-size: 12px; }
+    .sight small b.need, .fact b.need { color: #9a3b32; font-weight: 600; }
     .stars { color: var(--water); font-size: 12px; letter-spacing: 1px; }
     .stars i { font-style: normal; color: #c5d4ce; }
     .food-block {
@@ -418,7 +419,7 @@
         <article class="day">
           <h3>5日<span>去奉节</span></h3>
           <p>早上三友包子，然后去奉节，大约 1 小时。白天看白帝城、夔门，中午在奉节吃。傍晚开回巫山，晚饭再在巫山吃。</p>
-          <p>小寨天坑在奉节以南，当天回巫山排不下。小三峡、神女峰、小红船都要大半天，车也上不了船。</p>
+          <p>小寨天坑公开信息写着暂停营业，又在奉节以南，当天回巫山排不下。小三峡、神女峰、小红船都要大半天，车也上不了船。</p>
         </article>
         <article class="day">
           <h3>6日<span>回武汉</span></h3>
@@ -559,8 +560,8 @@
       <button class="modal-close" type="button" data-close>关闭</button>
       <h3>参考</h3>
       <p>景点、船班和吃食整理自赖导两集：<a href="https://www.bilibili.com/video/BV1F9U8BzE3F/" target="_blank" rel="noopener">上集 奉节→巫山</a>，<a href="https://www.bilibili.com/video/BV1TwS7BmETP/" target="_blank" rel="noopener">下集</a>。票价是船上扫码的大约数，出发前以码头当日为准。</p>
-      <p>白帝城旺季 3/1–10/30 约 100 元，淡季约 60 元。观夔门含在景区里。神女大扶梯单程约 3 元。看神女峰正脸坐巫山到巴东的水上公交，巫山段约 40 元，鳊鱼溪换小白船约 50 元，船上扫码，不用预订。</p>
-      <p>三峡之巅、小寨天坑、小三峡、神女溪、翡翠凉粉、搭搭面来自公开介绍。三峡之巅大门票免费，上下山交通另计。天坑、小三峡、神女溪的票价各处写得不一样，出发前以景区当日为准。</p>
+      <p>白帝城·瞿塘峡、三峡之巅都要预约。微信小程序搜「白帝城瞿塘峡景区」，提前 15 天，当天最迟提前 1 小时，凭身份证入园。白帝城旺季 3 月 1 日到 10 月底全票 100 元，淡季 60 元。观夔门含在这张票里。三峡之巅索道按县发改委限价：上行 50 元、下行 40 元、往返最高 80 元。大门票以当日为准。</p>
+      <p>小红船约 40 元，巫峡水上公交巫山段约 40 元、换小白船约 50 元，神女大扶梯单程约 3 元，都是现场扫码，不用预约。神女峰正脸含在巫峡船票里。小三峡约 120 元、神女溪约 110 元，巫山游客中心现场买。小寨天坑携程写着暂停营业，票价先不写死。</p>
     </div>
   </div>
   <script>
@@ -569,72 +570,72 @@
       {
         id: "baidi", name: "白帝城", bank: "fj", stars: 5,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Baidicheng_2014.jpg/960px-Baidicheng_2014.jpg",
-        ticket: "约 100 元", where: "县城以东约 10 公里",
+        ticket: "旺季 100 元", book: "需预约 · 小程序「白帝城瞿塘峡景区」", where: "县城以东约 10 公里",
         intro: "瞿塘峡口的白帝城，李白「朝辞白帝彩云间」写的就是这儿。水位抬升后城在山上，江在脚下。托孤堂、观夔门是城里两处主要看点。",
-        tip: "从巫山过来大约 1 小时进奉节，再到景区 20 到 30 分钟。5日早上先看这里和夔门。旺季 3 月到 10 月约 100 元，淡季约 60 元。国庆按旺季。"
+        tip: "需预约。微信小程序搜「白帝城瞿塘峡景区」，提前 15 天，当天最迟提前 1 小时，凭身份证入园。旺季 3 月 1 日到 10 月底全票 100 元，淡季 60 元。国庆按旺季。从巫山过来大约 1 小时进奉节，再到景区 20 到 30 分钟。"
       },
       {
         id: "kuimen", name: "夔门", bank: "fj", stars: 5,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Qutang_Gorge_on_Changjiang.jpg/960px-Qutang_Gorge_on_Changjiang.jpg",
-        ticket: "含在白帝城", where: "与白帝城同在峡口",
+        ticket: "含在白帝城", book: "跟着预约 · 小程序「白帝城瞿塘峡景区」", where: "与白帝城同在峡口",
         intro: "长江在这里被两岸绝壁收成一道门，是瞿塘峡入口。十元纸币背面那座门，指的就是夔门。白帝城高处能看，小红船过峡时甲板上也能看。",
-        tip: "5日在白帝城高处看。想在船上再看一遍，要另留大半天，车不能跟着上船。"
+        tip: "景区里看含在白帝城门票里，预约跟着白帝城一起办。江上看要另坐小红船，船上扫码，不用预约。5日在白帝城高处看就够。"
       },
       {
         id: "peak", name: "三峡之巅", bank: "fj", stars: 5,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/%E9%87%8D%E5%BA%86%E5%A5%89%E8%8A%82-%E4%B8%89%E5%B3%A1%E4%B9%8B%E5%B7%85_Peak_of_the_Three_Gorges.jpg/960px-%E9%87%8D%E5%BA%86%E5%A5%89%E8%8A%82-%E4%B8%89%E5%B3%A1%E4%B9%8B%E5%B7%85_Peak_of_the_Three_Gorges.jpg",
-        ticket: "交通另计", where: "赤甲山顶，夔门之上",
+        ticket: "索道另计", book: "需预约 · 小程序「白帝城瞿塘峡景区」", where: "赤甲山顶，夔门之上",
         intro: "杜甫写「赤甲白盐俱刺天」的那座山。站在赤甲山顶，能俯瞰夔门和长江拐弯。2020 年开园，国家 4A。",
-        tip: "大门票免费，上下山要另坐索道或观光车。大约 8:00 到 19:00 开放。和白帝城在同一片山上，5日上午看完白帝城，下午还有时间可以上去，傍晚回巫山。"
+        tip: "需预约，小程序里选「三峡之巅」，提前 15 天，当天最迟提前 1 小时。索道按县发改委限价：上行 50 元、下行 40 元、往返最高 80 元。大门票各处写得不一样，买的时候看当日价。和白帝城在同一片山上，5日下午还有时间可以上去。"
       },
       {
         id: "tiankeng", name: "小寨天坑", bank: "fj", stars: 4,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Xiaozhaitiankeng.jpg/960px-Xiaozhaitiankeng.jpg",
-        ticket: "景区售票", where: "兴隆镇，县城以南约 80 公里",
+        ticket: "暂停营业", book: "先确认开门", where: "兴隆镇，县城以南约 80 公里",
         intro: "很深的岩溶漏斗。坑口直径大约 500 多米，深大约 660 米，四壁像刀切下去。从坑口走到坑底有两千多级台阶。",
-        tip: "在县城以南约 80 公里，和回巫山不是一条路。5日要当晚回巫山，这天不排。门票旺季淡季不一样，出发前再核对。"
+        tip: "携程写着暂停营业，恢复时间待定，票价先不写死。咨询 023-56789228。5日要当晚回巫山，这天也排不下。"
       },
       {
         id: "boat", name: "瞿塘峡 · 小红船", bank: "river", stars: 4,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/%E7%99%BD%E5%B8%9D%E5%9F%8E%C2%B7%E7%9E%BF%E5%A1%98%E5%B3%A1_03.jpg/960px-%E7%99%BD%E5%B8%9D%E5%9F%8E%C2%B7%E7%9E%BF%E5%A1%98%E5%B3%A1_03.jpg",
-        ticket: "约 40 元", where: "奉节小红船码头",
-        intro: "奉节小红船码头开往巫山古城码头。常见 8:00、13:20，约 3.5 小时，约 40 元，船上扫码。过白帝城、夔门、瞿塘峡。左边入口去神女峰，右边入口回奉节。",
+        ticket: "约 40 元", book: "不用预约", where: "奉节小红船码头",
+        intro: "奉节小红船码头开往巫山古城码头。常见 8:00、13:20，约 3.5 小时，约 40 元，船上扫码，不用预约。过白帝城、夔门、瞿塘峡。左边入口去神女峰，右边入口回奉节。",
         tip: "车不能上船。5日要开车回巫山，这天不排。地图搜「小红船码头」，不去宝塔坪。"
       },
       {
         id: "lift", name: "神女大扶梯", bank: "ws", stars: 4,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Chongqing_wushan_night_view.jpg/960px-Chongqing_wushan_night_view.jpg",
-        ticket: "约 3 元", where: "巫山县城坡上",
+        ticket: "约 3 元", book: "不用预约", where: "巫山县城坡上",
         intro: "移民后的巫山贴着江岸建在坡上。神女大扶梯是城里上下坡最省事的一段，扶梯、梯坎和江边连着走，就是赖导上集里的山城。",
         tip: "单程约 3 元，刷卡或扫码。梯坎本身免费。从古城码头步行就能到。"
       },
       {
         id: "shennv", name: "神女峰", bank: "ws", stars: 5,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Spitze-der-Goettin.jpg/960px-Spitze-der-Goettin.jpg",
-        ticket: "随船", where: "水路约 15 公里",
+        ticket: "含在巫峡船票", book: "不用预约", where: "水路约 15 公里",
         intro: "巫山十二峰里最出名的一座，江上看像立在崖上的神女。正脸在巫峡江面上。县城里的神女雕塑是另一处，代替不了江上的峰。",
         tip: "坐巫山到巴东的水上公交，走古城码头左边入口，牌上写「巫山–神女峰–培石」。开船大约一小时可见正脸。"
       },
       {
         id: "wuxia", name: "巫峡", bank: "ws", stars: 4,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Wu_Gorge_2016_6.jpg/960px-Wu_Gorge_2016_6.jpg",
-        ticket: "约 40 + 50 元", where: "水路约 40 公里",
+        ticket: "约 40 + 50 元", book: "不用预约", where: "水路约 40 公里",
         intro: "三峡里最长的一段，大约 40 多公里，两岸十二峰常有云雾。赖导下集走的就是这条水上公交：巫山左边入口，鳊鱼溪换小白船，到巴东。",
         tip: "全程大约 5 小时。巫山段约 40 元，换小白船约 50 元，船上扫码，不用预订。早上 8:00 有一班。"
       },
       {
         id: "xiaosanxia", name: "小三峡", bank: "ws", stars: 5,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/The_Little_Three_Gorges_along_Daning_river_in_Wushan%2CChongqing.JPG/960px-The_Little_Three_Gorges_along_Daning_river_in_Wushan%2CChongqing.JPG",
-        ticket: "坐船", where: "大宁河，巫山游客中心登船",
+        ticket: "约 120 元", book: "不用预约", where: "大宁河，巫山游客中心登船",
         intro: "大宁河上的龙门峡、巴雾峡、滴翠峡合称小三峡，国家 5A。水比长江清，峡谷更窄，坐船大约半天。再往里是小小三峡。",
-        tip: "从巫山游客中心上船。这一段能看到悬棺。船程里常停大昌古镇，蓄水后镇子迁到更高的坡上。"
+        tip: "约 120 元含船，巫山游客中心现场买，刷身份证登船，不用提前预约。上午大约 8:50、下午 2:00 发船，人多会滚动发班。这一段能看到悬棺，常停大昌古镇。"
       },
       {
         id: "shennvxi", name: "神女溪", bank: "ws", stars: 4,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/%E7%A5%9E%E5%A5%B3%E6%BA%AA_-_panoramio.jpg/960px-%E7%A5%9E%E5%A5%B3%E6%BA%AA_-_panoramio.jpg",
-        ticket: "坐船", where: "巫峡南岸，与神女峰隔江",
+        ticket: "约 110 元", book: "不用预约", where: "巫峡南岸，与神女峰隔江",
         intro: "当地也叫美女溪，长约 15 公里。从巫山坐船过一段巫峡，到溪口换画舫进去。溪的上游能看到起云峰、净坛峰这一侧的山。",
-        tip: "和江上看神女峰可以放在同一段水路里考虑。溪和峰是两处，峰的正脸仍在大江上。"
+        tip: "约 110 元，小三峡游客中心现场买，不用提前预约。船多在上午，大约 8:30 到 13:00。和 5 日去奉节撞时间，这次排不进。"
       }
     ];
     var FOODS = [
@@ -696,12 +697,15 @@
     function card(item, kind) {
       var cls = kind === "eat" ? "dish" : "sight";
       var copy = kind === "eat" ? "dish-copy" : "sight-copy";
+      var book = item.book
+        ? ' · <b class="' + (item.book === "不用预约" ? "ok" : "need") + '">' + item.book + "</b>"
+        : "";
       return '<button class="' + cls + '" type="button" data-id="' + item.id + '">' +
         '<img alt="" src="' + item.img + '">' +
         '<span class="' + copy + '"><strong>' + item.name + '</strong>' +
         stars(item.stars) +
         '<p>' + item.intro + '</p>' +
-        '<small>' + item.ticket + ' · ' + item.where + '</small></span></button>';
+        '<small>' + item.ticket + book + " · " + item.where + "</small></span></button>";
     }
     function fill(list, el, kind) {
       el.innerHTML = list.map(function (item) { return card(item, kind); }).join("");
@@ -728,8 +732,12 @@
     function openCard(item) {
       document.getElementById("m-img").src = item.img;
       document.getElementById("m-name").textContent = item.name;
+      var book = item.book
+        ? "<span>预约</span><span>" + (item.book === "不用预约" ? item.book : '<b class="need">' + item.book + "</b>") + "</span>"
+        : "";
       document.getElementById("m-facts").innerHTML =
         "<span>推荐</span><span>" + stars(item.stars) + "</span>" +
+        book +
         "<span>花费</span><span>" + item.ticket + "</span>" +
         "<span>位置</span><span>" + item.where + "</span>";
       document.getElementById("m-intro").textContent = item.intro;
