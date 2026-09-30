@@ -17,13 +17,17 @@
       background: #fff;
     }
     header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
       display: flex;
-      align-items: baseline;
+      align-items: center;
       justify-content: space-between;
       gap: 16px;
       max-width: 1280px;
       margin: 0 auto;
-      padding: 22px 28px 4px;
+      padding: 22px 28px 10px;
+      background: #fff;
     }
     h1 {
       margin: 0;
@@ -31,7 +35,13 @@
       font-weight: 700;
       letter-spacing: 0.22em;
     }
-    .meta { color: #8a8f98; font-size: 13px; letter-spacing: 0.08em; }
+    .meta {
+      color: #8a8f98;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      line-height: 1.7;
+      text-align: right;
+    }
     .trips {
       max-width: 1280px;
       margin: 0 auto;
@@ -85,7 +95,7 @@
 <body>
   <header>
     <h1>出游攻略</h1>
-    <span class="meta">2026 · 从武汉出发</span>
+    <span class="meta">兴来每独往，胜事空自知<br>行到水穷处，坐看云起时</span>
   </header>
   <main class="trips">
     <a class="trip jd" href="景德镇.html">
