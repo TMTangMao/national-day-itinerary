@@ -304,6 +304,20 @@
     .fact { display: grid; grid-template-columns: 3em 1fr; gap: 4px 10px; margin-bottom: 12px; }
     .fact span { color: var(--mute); font-size: 13px; }
     .modal-card p { margin: 0 0 8px; line-height: 1.65; }
+    .route { margin: 4px 0 12px; }
+    .route b.kicker {
+      display: block; margin: 0 0 8px;
+      font-size: 13px; letter-spacing: 0.12em; color: var(--water); font-weight: 600;
+    }
+    .route ol { margin: 0; padding: 0; list-style: none; }
+    .route li {
+      display: grid; grid-template-columns: 1.6em 1fr; gap: 2px 8px;
+      padding: 8px 0; border-top: 1px solid #d5e0dc;
+    }
+    .route li:first-child { border-top: 0; }
+    .route .n { color: var(--water); font-size: 13px; font-weight: 700; }
+    .route .name { font-weight: 600; }
+    .route .say { grid-column: 2; color: var(--mute); font-size: 13px; line-height: 1.55; }
     @media (max-width: 860px) {
       .mouth { height: 38vh; min-height: 220px; }
       .home { top: max(12px, env(safe-area-inset-top)); left: 14px; }
@@ -552,6 +566,10 @@
       <h3 id="m-name"></h3>
       <div class="fact" id="m-facts"></div>
       <p id="m-intro"></p>
+      <div class="route" id="m-route" hidden>
+        <b class="kicker" id="m-route-title"></b>
+        <ol id="m-steps"></ol>
+      </div>
       <p id="m-tip"></p>
     </div>
   </div>
@@ -560,7 +578,7 @@
       <button class="modal-close" type="button" data-close>关闭</button>
       <h3>参考</h3>
       <p>景点、船班和吃食整理自赖导两集：<a href="https://www.bilibili.com/video/BV1F9U8BzE3F/" target="_blank" rel="noopener">上集 奉节→巫山</a>，<a href="https://www.bilibili.com/video/BV1TwS7BmETP/" target="_blank" rel="noopener">下集</a>。票价是船上扫码的大约数，出发前以码头当日为准。</p>
-      <p>白帝城·瞿塘峡、三峡之巅都要预约。微信小程序搜「白帝城瞿塘峡景区」，提前 15 天，当天最迟提前 1 小时，凭身份证入园。白帝城旺季 3 月 1 日到 10 月底全票 100 元，淡季 60 元。观夔门含在这张票里。三峡之巅索道按县发改委限价：上行 50 元、下行 40 元、往返最高 80 元。大门票以当日为准。</p>
+      <p>白帝城·瞿塘峡、三峡之巅都要预约。微信小程序搜「畅游奉节」，提前 15 天，当天最迟提前 1 小时，凭身份证入园。白帝城旺季 3 月 1 日到 10 月底全票 100 元，淡季 60 元。观夔门含在这张票里。三峡之巅索道按县发改委限价：上行 50 元、下行 40 元、往返最高 80 元。大门票以当日为准。</p>
       <p>小红船约 40 元，巫峡水上公交巫山段约 40 元、换小白船约 50 元，神女大扶梯单程约 3 元，都是现场扫码，不用预约。神女峰正脸含在巫峡船票里。小三峡约 120 元、神女溪约 110 元，巫山游客中心现场买。小寨天坑携程写着暂停营业，票价先不写死。</p>
     </div>
   </div>
@@ -570,23 +588,45 @@
       {
         id: "baidi", name: "白帝城", bank: "fj", stars: 5,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Baidicheng_2014.jpg/960px-Baidicheng_2014.jpg",
-        ticket: "旺季 100 元", book: "需预约 · 小程序「白帝城瞿塘峡景区」", where: "县城以东约 10 公里",
-        intro: "瞿塘峡口的白帝城，李白「朝辞白帝彩云间」写的就是这儿。水位抬升后城在山上，江在脚下。托孤堂、观夔门是城里两处主要看点。",
-        tip: "需预约。微信小程序搜「白帝城瞿塘峡景区」，提前 15 天，当天最迟提前 1 小时，凭身份证入园。旺季 3 月 1 日到 10 月底全票 100 元，淡季 60 元。国庆按旺季。从巫山过来大约 1 小时进奉节，再到景区 20 到 30 分钟。"
+        ticket: "旺季 100 元", book: "需预约 · 小程序「畅游奉节」", where: "县城以东约 10 公里",
+        intro: "瞿塘峡口的白帝城，李白「朝辞白帝彩云间」写的就是这儿。水位抬升后城在山上，江在脚下。5日按下面这条走，大约两小时，把庙和夔门看完。",
+        routeTitle: "园内 · 约 2 小时",
+        route: [
+          { name: "验票口、风雨廊桥", text: "检票后先过廊桥。情景剧如果在演，停一下就走，别耗在广场。" },
+          { name: "前山上山", text: "台阶上白帝庙。观星亭的红墙在半山，上来就能看见。" },
+          { name: "白帝庙大门", text: "大门一带有李白诗碑，「朝辞白帝彩云间」写在这里。进前厅再往里。" },
+          { name: "明良殿", text: "殿里接着走文臣厅、武将厅、八阵厅、伐吴堂、蜀汉堂。刘备、关张和诸葛亮的塑像在这一串厅里。" },
+          { name: "武侯祠、托孤堂", text: "白帝城的正题在托孤堂：刘备病重，把儿子托给诸葛亮。武侯祠就在旁边。" },
+          { name: "观星亭、白楼", text: "观星亭红墙最出片。亭在高处，江在脚下。白楼顺路看。" },
+          { name: "碑林、竹枝园、悬棺", text: "三峡第一碑林、竹枝园、悬棺陈列室连在一起。碑和悬棺模型看一眼，不必久留。" },
+          { name: "夔门观景台", text: "十元纸币背面那道门从这里看。5日看夔门就停在这个台，不必再坐船进峡。" },
+          { name: "后山下山", text: "下到观峡亭、杜甫雕塑，回到游船码头和忠义广场，从风雨廊桥出去。" }
+        ],
+        tip: "需预约。微信小程序搜「畅游奉节」，提前 15 天，当天最迟提前 1 小时，凭身份证入园。旺季 3 月 1 日到 10 月底全票 100 元，淡季 60 元。国庆按旺季。坐船深度游瞿塘峡还要再加大约两小时，车不能上船。5日要开车回巫山，不排这段。"
       },
       {
         id: "kuimen", name: "夔门", bank: "fj", stars: 5,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Qutang_Gorge_on_Changjiang.jpg/960px-Qutang_Gorge_on_Changjiang.jpg",
-        ticket: "含在白帝城", book: "跟着预约 · 小程序「白帝城瞿塘峡景区」", where: "与白帝城同在峡口",
+        ticket: "含在白帝城", book: "跟着预约 · 小程序「畅游奉节」", where: "与白帝城同在峡口",
         intro: "长江在这里被两岸绝壁收成一道门，是瞿塘峡入口。十元纸币背面那座门，指的就是夔门。白帝城高处能看，小红船过峡时甲板上也能看。",
         tip: "景区里看含在白帝城门票里，预约跟着白帝城一起办。江上看要另坐小红船，船上扫码，不用预约。5日在白帝城高处看就够。"
       },
       {
         id: "peak", name: "三峡之巅", bank: "fj", stars: 5,
         img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/%E9%87%8D%E5%BA%86%E5%A5%89%E8%8A%82-%E4%B8%89%E5%B3%A1%E4%B9%8B%E5%B7%85_Peak_of_the_Three_Gorges.jpg/960px-%E9%87%8D%E5%BA%86%E5%A5%89%E8%8A%82-%E4%B8%89%E5%B3%A1%E4%B9%8B%E5%B7%85_Peak_of_the_Three_Gorges.jpg",
-        ticket: "索道另计", book: "需预约 · 小程序「白帝城瞿塘峡景区」", where: "赤甲山顶，夔门之上",
-        intro: "杜甫写「赤甲白盐俱刺天」的那座山。站在赤甲山顶，能俯瞰夔门和长江拐弯。2020 年开园，国家 4A。",
-        tip: "需预约，小程序里选「三峡之巅」，提前 15 天，当天最迟提前 1 小时。索道按县发改委限价：上行 50 元、下行 40 元、往返最高 80 元。大门票各处写得不一样，买的时候看当日价。和白帝城在同一片山上，5日下午还有时间可以上去。"
+        ticket: "索道另计", book: "需预约 · 小程序「畅游奉节」", where: "赤甲山顶，夔门之上",
+        intro: "杜甫写「赤甲白盐俱刺天」的那座山。站在赤甲山顶，能俯瞰夔门和长江拐弯。2020 年开园，国家 4A。5日如果白帝城看完还有下午，按下面这条上山。",
+        routeTitle: "从白帝城开车过去",
+        route: [
+          { name: "白帝城停车场出来", text: "两个景区之间没有摆渡车，景区内也不能把车开上山顶。看完白帝城，从停车场自己开。导航「三峡之巅石庙游客中心」，山路大约 16 公里，车停石庙停车场。想坐观光车就导航「蓝月河游客中心」，大约 24 公里。两个中心相距大约 8 公里，只去一个。" },
+          { name: "石庙坐索道", text: "石庙游客中心就是索道下站。上行 50 元、下行 40 元，往返最高 80 元。索道到赤甲广场附近，下站仍在半山，不是山脚。" },
+          { name: "或蓝月河坐观光车", text: "蓝月河游客中心换乘观光车，往返 30 元、单程 20 元，也到赤甲广场一带。比索道便宜，山路弯，晕车就改去石庙坐索道。" },
+          { name: "赤甲广场", text: "索道和观光车都停在广场附近。从这里开始走路，不用再爬那十条山路。" },
+          { name: "往观景台走", text: "出广场走悠悠桥、银汉亭、海月亭、诗仙台，再上山海步道。这一段大约 20 分钟，风大，外套带着。" },
+          { name: "极目台、千里台", text: "山顶就停这两处。极目台看夔门和长江拐弯，千里台看更远的峡。玻璃观景台在这一带，脚软就别往外探。" },
+          { name: "原路下山取车", text: "清猿台、垂萝台、彩云台顺路经过就行。回到赤甲广场，坐来时的索道或观光车下去，到石庙或蓝月河取车，再开回巫山。白帝城赤甲楼那条山路大约 10 公里、5 到 6 小时，5日不走。" }
+        ],
+        tip: "需预约，小程序「畅游奉节」里选「三峡之巅」，提前 15 天，当天最迟提前 1 小时。大门票各处写得不一样，买的时候看当日价。和白帝城是两个景区，票分开买。高铁站的旅游直通车 30 元会停白帝城和石庙，班次有限。5日是自己开车，看完白帝城直接开过去。"
       },
       {
         id: "tiankeng", name: "小寨天坑", bank: "fj", stars: 4,
@@ -741,6 +781,18 @@
         "<span>花费</span><span>" + item.ticket + "</span>" +
         "<span>位置</span><span>" + item.where + "</span>";
       document.getElementById("m-intro").textContent = item.intro;
+      var route = document.getElementById("m-route");
+      var steps = document.getElementById("m-steps");
+      if (item.route) {
+        document.getElementById("m-route-title").textContent = item.routeTitle;
+        steps.innerHTML = item.route.map(function (step, i) {
+          return "<li><span class='n'>" + (i + 1) + "</span><span class='name'>" + step.name + "</span><span class='say'>" + step.text + "</span></li>";
+        }).join("");
+        route.hidden = false;
+      } else {
+        steps.innerHTML = "";
+        route.hidden = true;
+      }
       document.getElementById("m-tip").textContent = item.tip;
       show(document.getElementById("card-modal"));
     }
